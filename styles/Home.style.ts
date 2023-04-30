@@ -35,6 +35,7 @@ export default StyleSheet.create({
   },
   tabBar: {
     backgroundColor: 'white',
+    paddingTop: 10
   },
   label: {
     color: 'black',
@@ -50,4 +51,12 @@ export default StyleSheet.create({
     width: 150,
     height: 40,
   },
+  dropdownContainer: {
+    position: 'absolute',
+    zIndex: 9999, // Ensure it is above other elements
+    top: 0, // Adjust this value to position the dropdown correctly
+    left: 10,
+    borderColor: "transparent"
+  },
+  
 });

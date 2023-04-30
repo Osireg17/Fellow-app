@@ -7,6 +7,7 @@ import {
   Text,
   useWindowDimensions,
   KeyboardAvoidingView,
+  SafeAreaView
 } from 'react-native';
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -16,6 +17,7 @@ import { database } from '../config/firebase';
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import styles from "../styles/Home.style"
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const FirstRoute = () => (
   <View style={[styles.scene, { backgroundColor: '#EDEDED' }]} />
@@ -47,11 +49,25 @@ async function fetchProfilePicture(uid) {
   }
 }
 
-export default function MainFeed() {
+export default function MainFeed({navigation}) {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'first', title: 'For You' },
     { key: 'second', title: 'Following' },
+  ]);
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    {label: 'Trending', value: 'trending'},
+    {
+      label: 'Latest',
+      value: 'latest',
+    },
+    {
+      label: 'Home',
+      value: 'Home',
+    }
   ]);
 
   
@@ -68,25 +84,50 @@ export default function MainFeed() {
     });
   }, [uid]);
   
+  const NavigateToProfile = () => {
+    //complete the function to navigate to the profile page
+    navigation.navigate('Profile');
+  }
 
   const [selectedValue, setSelectedValue] = useState("home");
 
   const layout = useWindowDimensions();
+
 
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
         <HeaderRNE
           containerStyle={{
-            height: 115,
-            paddingBottom: 10,
-            paddingTop: 10,
+            height: 120,
+            paddingBottom: 30,
+            paddingTop: 20,
             backgroundColor: '#FFFFFF',
+            zIndex: 100
           }}
           leftComponent={
-            <View style={styles.leftComponent}>
-              <Text style={styles.title}>Home</Text>
-              <Feather name="chevron-down" size={24} color="black" />
+            <View style={styles.dropdownContainer}>
+              <DropDownPicker
+                placeholder='Home'
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+                setItems={setItems}
+                style={{
+                  backgroundColor: "#ffffff",
+                  borderWidth: 0,
+                  borderColor: "white",
+                  borderRadius: 0,
+                }}
+                containerStyle={{
+                  width: 150,
+                  height: 40,
+                  borderRadius: 0,
+                }}
+                
+              />
             </View>
           }
           rightComponent={
@@ -94,7 +135,7 @@ export default function MainFeed() {
               <TouchableOpacity>
                 <FontAwesome name="search" size={24} color="black" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.profileImageContainer}>
+              <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
               <Image
                   source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
                   style={styles.profileImage}

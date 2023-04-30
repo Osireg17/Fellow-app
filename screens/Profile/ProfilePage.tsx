@@ -19,7 +19,7 @@ function ProfileHeader({ navigation }) {
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
       }
-      centerComponent={{ text: 'Profile', style: { color: 'black', fontSize: 18 } }}
+      // centerComponent={{ text: 'Profile', style: { color: 'black', fontSize: 18 } }}
       rightComponent={
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity>

@@ -10,11 +10,12 @@ import CreateProfile from '../../Fellow/screens/Authentication/CreateProfile'
 import Login from '../../Fellow/screens/Authentication/LogIn'
 import BiblePage from '../../Fellow/screens/Bible/BiblePage'
 import Home from '../../Fellow/screens/Home';
-import Questions from '../../Fellow/screens/Feeds/Questions'
-import ProfilePage from '../../Fellow/screens/Profile/ProfilePage'
+import Questions from '../../Fellow/screens/Feeds/Questions';
+import ProfilePage from '../../Fellow/screens/Profile/ProfilePage';
+import Activity from '../screens/Feeds/Activity'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // import Home from '../screens/Home'
-import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons } from '@expo/vector-icons';
+import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, FontAwesome } from '@expo/vector-icons';
 
 
 import { auth } from '../config/firebase'
@@ -67,6 +68,14 @@ function Feeds() {
           tabBarIcon: ({ color }) => <FontAwesome5 name="bible" size={24} color={color} />,
           headerShown: false,
         }}
+      />
+      <Tab.Screen
+      name="Activity"
+      component={Activity}
+      options={{
+        tabBarIcon: ({ color }) => <FontAwesome name="bell-o" size={24} color={color}/>,
+        headerShown: false,
+      }}
       />
       <Tab.Screen
         name="Profile"
