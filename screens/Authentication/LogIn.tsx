@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import * as AppleAuthentication from 'expo-apple-authentication';
-
+import { database } from "../../config/firebase";
 
 import { styles } from "../../styles/Authentication/LogIn.style";
 
@@ -59,7 +59,6 @@ export default function Login({ navigation }) {
         .catch((err) => Alert.alert("Login error", err.message));
     }
   };
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -123,7 +122,7 @@ export default function Login({ navigation }) {
     </View>
     </ScrollView>
     </KeyboardAvoidingView>
-);
+  );
 }
 
 
