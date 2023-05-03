@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,7 +7,9 @@ import {
   Text,
   useWindowDimensions,
   KeyboardAvoidingView,
-  SafeAreaView
+  SafeAreaView, 
+  ScrollView,
+  TextInput,
 } from 'react-native';
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -50,6 +52,9 @@ async function fetchProfilePicture(uid) {
 }
 
 export default function MainFeed({navigation}) {
+
+  const [searchBarVisible, setSearchBarVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'first', title: 'For You' },
@@ -71,6 +76,7 @@ export default function MainFeed({navigation}) {
   ]);
 
   
+  
   const [profilePicture, setProfilePicture] = useState('');
 
   const auth = getAuth();
@@ -88,6 +94,10 @@ export default function MainFeed({navigation}) {
     //complete the function to navigate to the profile page
     navigation.navigate('Profile');
   }
+
+  const handleSearchIconPress = () => {
+    setSearchBarVisible(true);
+  };
 
   const [selectedValue, setSelectedValue] = useState("home");
 
@@ -130,17 +140,43 @@ export default function MainFeed({navigation}) {
               />
             </View>
           }
+          // rightComponent={
+          //   <View style={styles.rightComponent}>
+          //     <TouchableOpacity onPress={handleSearchIconPress}>
+          //       <FontAwesome name="search" size={24} color="black" />
+          //     </TouchableOpacity>
+          //     <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
+          //     <Image
+          //         source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
+          //         style={styles.profileImage}
+          //       />
+          //     </TouchableOpacity>
+          //   </View>
+          // }
           rightComponent={
             <View style={styles.rightComponent}>
-              <TouchableOpacity>
-                <FontAwesome name="search" size={24} color="black" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
-              <Image
-                  source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
-                  style={styles.profileImage}
+              {searchBarVisible ? (
+                <TextInput
+                  style={styles.searchBar}
+                  onChangeText={text => setSearchText(text)}
+                  value={searchText}
+                  placeholder="Search"
+                  autoFocus={true}
+                  onBlur={() => setSearchBarVisible(false)}
                 />
-              </TouchableOpacity>
+              ) : (
+                <>
+                  <TouchableOpacity onPress={handleSearchIconPress}>
+                    <FontAwesome name="search" size={24} color="black" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
+                    <Image
+                      source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
+                      style={styles.profileImage}
+                    />
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           }
         />

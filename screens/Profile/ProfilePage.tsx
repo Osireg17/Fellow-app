@@ -9,9 +9,19 @@ import { database } from '../../config/firebase';
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import * as Clipboard from 'expo-clipboard';
+import { DrawerActions } from '@react-navigation/native';
 
 
 function ProfileHeader({ navigation }) {
+
+  // open the drawer when the menu icon is pressed
+  const openMenu = () => {
+    navigation.dispatch(DrawerActions.openDrawer());
+  };
+  
+
+
+
   return (
     <HeaderRNE
       leftComponent={
@@ -25,7 +35,7 @@ function ProfileHeader({ navigation }) {
           <TouchableOpacity>
             <MaterialCommunityIcons name="pencil" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={openMenu}>
             <Feather name="menu" size={24} color="black" />
           </TouchableOpacity>
         </View>

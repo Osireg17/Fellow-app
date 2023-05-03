@@ -58,5 +58,14 @@ export default StyleSheet.create({
     left: 10,
     borderColor: "transparent"
   },
-  
+  searchBar: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#CCCCCC',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    width: '110%', // Increase the width percentage
+    marginRight: 10,
+    marginLeft: -20, // Add a negative margin on the left side to move it over
+  },
 });

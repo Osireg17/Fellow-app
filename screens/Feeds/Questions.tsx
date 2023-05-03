@@ -30,6 +30,8 @@ async function fetchProfilePicture(uid) {
 
 function QuestionHeader({ navigation }) {
 
+  const [searchBarVisible, setSearchBarVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
 
   const auth = getAuth();
@@ -42,6 +44,11 @@ function QuestionHeader({ navigation }) {
 
     });
   }, [uid]);
+
+  const handleSearchIconPress = () => {
+    setSearchBarVisible(!searchBarVisible);
+  };
+  
   
   const NavigateToProfile = () => {
     //complete the function to navigate to the profile page
@@ -61,19 +68,32 @@ function QuestionHeader({ navigation }) {
   // }}
   rightComponent={
     <View style={styles.rightComponent}>
-      <TouchableOpacity style={styles.searchButton}>
-        <FontAwesome name="search" size={24} color="black" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.optionsButton}>
-        <Ionicons name="ios-options-outline" size={24} color="black" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
-        <Image
-          source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
-          style={styles.profileImage}
+      {searchBarVisible ? (
+        <TextInput
+          style={styles.searchBar}
+          onChangeText={text => setSearchText(text)}
+          value={searchText}
+          placeholder="Search"
+          autoFocus={true}
+          onBlur={() => setSearchBarVisible(false)}
         />
-      </TouchableOpacity>
-    </View>
+      ) : (
+        <>
+          <TouchableOpacity onPress={handleSearchIconPress} style={styles.searchButton}>
+            <FontAwesome name="search" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.optionsButton}>
+            <Ionicons name="ios-options-outline" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
+            <Image
+              source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
+        </>
+      )}
+      </View>
   }
   containerStyle={styles.headerContainer}
   />

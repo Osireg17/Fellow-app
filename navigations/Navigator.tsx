@@ -4,17 +4,18 @@ import {NavigationContainer} from '@react-navigation/native'
 import {createStackNavigator} from '@react-navigation/stack'
 import { onAuthStateChanged } from 'firebase/auth'
 
-import Welcome_Screen from '../../Fellow/screens/Welcome_Screen'
-import SignUp from '../../Fellow/screens/Authentication/SignUp'
-import CreateProfile from '../../Fellow/screens/Authentication/CreateProfile'
-import Login from '../../Fellow/screens/Authentication/LogIn'
-import BiblePage from '../../Fellow/screens/Bible/BiblePage'
-import Home from '../../Fellow/screens/Home';
-import Questions from '../../Fellow/screens/Feeds/Questions';
-import ProfilePage from '../../Fellow/screens/Profile/ProfilePage';
+import Welcome_Screen from '../screens/Welcome_Screen'
+import SignUp from '../screens/Authentication/SignUp'
+import CreateProfile from '../screens/Authentication/CreateProfile'
+import Login from '../screens/Authentication/LogIn'
+import BiblePage from '../screens/Bible/BiblePage'
+import Home from '../screens/Home';
+import Questions from '../screens/Feeds/Questions';
+import ProfilePage from '../screens/Profile/ProfilePage';
 import Activity from '../screens/Feeds/Activity'
+import Settings from '../screens/Profile/Settings'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// import Home from '../screens/Home'
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, FontAwesome } from '@expo/vector-icons';
 
 
@@ -25,6 +26,18 @@ const Stack = createStackNavigator()
 const AuthenticatedUserContext = createContext({});
 
 const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+
+// create a drawer navigator for the profile page
+function ProfileDrawer() {
+  return (
+    <Drawer.Navigator>
+      <Drawer.Screen name="Profile" component={ProfilePage} />
+      <Drawer.Screen name="Settings" component={Settings} />
+    </Drawer.Navigator>
+  );
+}
+
 
 function Feeds() {
   return (

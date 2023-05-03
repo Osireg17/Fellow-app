@@ -38,6 +38,17 @@ const styles = StyleSheet.create({
   optionsButton: {
     marginLeft: 10,
   },
+  searchBar: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#CCCCCC',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    width: '110%',
+    marginRight: 10,
+    marginLeft: -20,
+    marginTop: 5,
+  },
 });
 
 export default styles;
