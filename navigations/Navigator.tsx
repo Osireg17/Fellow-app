@@ -15,25 +15,56 @@ import ProfilePage from '../screens/Profile/ProfilePage';
 import Activity from '../screens/Feeds/Activity'
 import Settings from '../screens/Profile/Settings'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList  } from '@react-navigation/drawer';
 import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, FontAwesome } from '@expo/vector-icons';
 
 
 import { auth } from '../config/firebase'
 
-
-const Stack = createStackNavigator()
 const AuthenticatedUserContext = createContext({});
 
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+
+function CustomDrawerContent(props) {
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+    </DrawerContentScrollView>
+  );
+}
+
+const ProfileStack = createStackNavigator();
+
+function ProfileStackNavigator() {
+  return (
+    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+      <ProfileStack.Screen name="ProfilePage" component={ProfilePage} />
+      <ProfileStack.Screen name="ProfileDrawer" component={ProfileDrawer} />
+    </ProfileStack.Navigator>
+  );
+}
 
 // create a drawer navigator for the profile page
 function ProfileDrawer() {
   return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Profile" component={ProfilePage} />
-      <Drawer.Screen name="Settings" component={Settings} />
+    <Drawer.Navigator
+      initialRouteName="ProfilePage"
+      drawerType="back"
+      edgeWidth={0}
+      drawerPosition="right"
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        headerShown: false,
+        drawerStyle: {
+          backgroundColor: '#ffffff',
+          width: 240,
+          drawerPosition: 'right',
+        },
+      }}
+    >
+      <Drawer.Screen name="Settings" component={Feeds} />
     </Drawer.Navigator>
   );
 }
@@ -147,7 +178,7 @@ const MainStack = () => {
         <>
           <Stack.Screen
             name="Feeds"
-            component={Feeds}
+            component={ProfileDrawer}
             options={{headerShown: false}}
           />
         </>
