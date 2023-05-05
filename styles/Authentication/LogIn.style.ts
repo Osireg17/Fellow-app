@@ -116,4 +116,7 @@ export const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 2,
   },
+  forgotPasswordContainer: {
+    alignContent: "center",
+  },
 });

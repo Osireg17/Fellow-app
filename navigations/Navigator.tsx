@@ -20,6 +20,7 @@ import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, Fo
 
 
 import { auth } from '../config/firebase'
+import ForgotPassword from '../screens/Authentication/ForgotPassword'
 
 const AuthenticatedUserContext = createContext({});
 
@@ -200,6 +201,11 @@ const MainStack = () => {
           <Stack.Screen
             name="Login"
             component={Login}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPassword}
             options={{headerShown: false}}
           />
         </>

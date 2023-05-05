@@ -93,7 +93,10 @@ export default function Login({ navigation }) {
           value={password}
         />
         {passwordError && <Text style={styles.errorText}>Please enter your password.</Text>}
-        <TouchableOpacity>
+        <TouchableOpacity
+          style={styles.forgotPasswordContainer}
+          onPress={() => navigation.navigate("ForgotPassword")}
+        >
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.loginButton} onPress={onHandleLogin}>

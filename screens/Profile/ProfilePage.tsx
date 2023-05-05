@@ -92,7 +92,7 @@ function UserProfile() {
     <View style={styles.container}>
       <Avatar
         rounded
-        size={150}
+        size={120}
         source={{ uri: profilePic || 'https://via.placeholder.com/200' }}
         containerStyle={styles.avatar}
       />
