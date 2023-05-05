@@ -29,7 +29,8 @@ const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent(props) {
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView {...props}
+    >
       <DrawerItemList {...props} />
     </DrawerContentScrollView>
   );
@@ -57,6 +58,7 @@ function ProfileDrawer() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
+        drawerPosition: 'right',
         drawerStyle: {
           backgroundColor: '#ffffff',
           width: 240,
@@ -64,7 +66,8 @@ function ProfileDrawer() {
         },
       }}
     >
-      <Drawer.Screen name="Settings" component={Feeds} />
+      <Drawer.Screen name="Close" component={Feeds} />
+      <Drawer.Screen name="Settings" component={Settings} />
     </Drawer.Navigator>
   );
 }
