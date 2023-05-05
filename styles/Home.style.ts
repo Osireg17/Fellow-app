@@ -67,5 +67,6 @@ export default StyleSheet.create({
     width: '110%', // Increase the width percentage
     marginRight: 10,
     marginLeft: -20, // Add a negative margin on the left side to move it over
+    height: 20,
   },
 });
