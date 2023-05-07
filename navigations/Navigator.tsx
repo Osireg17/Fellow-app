@@ -14,6 +14,7 @@ import Questions from '../screens/Feeds/Questions';
 import ProfilePage from '../screens/Profile/ProfilePage';
 import Activity from '../screens/Feeds/Activity'
 import Settings from '../screens/Profile/Settings'
+import EditProfilePage from '../screens/Profile/EditProfilePage'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList  } from '@react-navigation/drawer';
 import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, FontAwesome } from '@expo/vector-icons';
@@ -183,6 +184,11 @@ const MainStack = () => {
           <Stack.Screen
             name="Feeds"
             component={ProfileDrawer}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="EditProfilePage"
+            component={EditProfilePage}
             options={{headerShown: false}}
           />
         </>

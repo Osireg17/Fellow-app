@@ -4,35 +4,27 @@ import styles from '../../styles/Profile/profilePage.style'
 import { Header as HeaderRNE,  Avatar } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { database } from '../../config/firebase';
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import * as Clipboard from 'expo-clipboard';
 import { DrawerActions } from '@react-navigation/native';
 
 
 function ProfileHeader({ navigation }) {
-
   // open the drawer when the menu icon is pressed
   const openMenu = () => {
     navigation.dispatch(DrawerActions.openDrawer());
   };
-  
-
-
-
   return (
     <HeaderRNE
-      leftComponent={
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-      }
-      // centerComponent={{ text: 'Profile', style: { color: 'black', fontSize: 18 } }}
       rightComponent={
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('EditProfilePage');
+            }}
+          >
             <MaterialCommunityIcons name="pencil" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity onPress={openMenu}>
@@ -49,38 +41,39 @@ function ProfileHeader({ navigation }) {
 }
 
 function UserProfile() {
-  const [copiedText, setCopiedText] = useState(null);
-  const [username, setUsername] = useState(null);
-  const [connections, setConnections] = useState(0);
-  const [praises, setPraises] = useState(0);
-  const [favoriteVerse, setFavoriteVerse] = useState(null);
-  const [church, setChurch] = useState(null);
-  const [profilePic, setProfilePic] = useState(null);
+  const [username, setUsername] = useState('');
+  const [connections, setConnections] = useState([]);
+  const [praises, setPraises] = useState([]);
+  const [favoriteVerse, setFavoriteVerse] = useState('');
+  const [church, setChurch] = useState('');
+  const [profilePic, setProfilePic] = useState('');
 
   useEffect(() => {
     const auth = getAuth();
     const userId = auth.currentUser.uid;
+    
 
-    const readData = async (userId) => {
-      try {
-        const userDocRef = doc(database, 'user', userId);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-          setUsername(userDocSnap.data().username);
-          setConnections(userDocSnap.data().connections);
-          setPraises(userDocSnap.data().praises);
-          setFavoriteVerse(userDocSnap.data().favouriteVerse);
-          setChurch(userDocSnap.data().church);
-          setProfilePic(userDocSnap.data().profilePicture);
-        } else {
-          console.log('No such document!');
-        }
-      } catch (error) {
-        console.log("Error fetching user's profile picture:", error);
+    const userDocRef = doc(database, 'user', userId);
+    
+    const unsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
+      if (userDocSnap.exists()) {
+        setUsername(userDocSnap.data().username);
+        setConnections(userDocSnap.data().connections);
+        setPraises(userDocSnap.data().praises);
+        setFavoriteVerse(userDocSnap.data().favouriteVerse);
+        setChurch(userDocSnap.data().church);
+        setProfilePic(userDocSnap.data().profilePicture);
+      } else {
+        console.log('No such document!');
       }
+    }, (error) => {
+      console.log("Error fetching user's profile picture:", error);
+    });
+
+    // Clean up the listener when the component is unmounted
+    return () => {
+      unsubscribe();
     };
-    readData(userId);
   }, []);
 
   const copyToClipboard = async () => {
@@ -124,10 +117,8 @@ function UserProfile() {
 }
 
 export default function ProfilePage({navigation}) {
-
   const auth = getAuth();
   const userId = auth.currentUser.uid;
-
   return (
     <SafeAreaProvider>
       <ProfileHeader navigation={navigation} />
