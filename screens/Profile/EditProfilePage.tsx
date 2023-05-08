@@ -8,6 +8,7 @@ import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import * as ImagePicker from 'expo-image-picker';
 
 
 function ProfileHeader({navigation}) {
@@ -28,6 +29,37 @@ function EditProfile({navigation}) {
     const [editFavouriteVerse, setEditFavouriteVerse] = useState('');
     const [editProfilePic, setEditProfilePic] = useState('');
     
+    // function to get the users' profile picture from storage, then have them be able to change it
+    const pickImage = async () => {
+        // ask for permission before going into the image gallery
+        if (Platform.OS !== 'web') {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+            alert('Sorry, we need camera roll permissions to make this work!');
+            }
+        }
+        // open the image gallery
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        // if the user selects an image, upload it to storage
+        if (!result.canceled) {
+            const auth = getAuth();
+            const userId = auth.currentUser.uid;
+            const storage = getStorage();
+            const storageRef = ref(storage, `profilePictures/${userId}`);
+            await uploadBytes(storageRef, result.uri);
+            const url = await getDownloadURL(storageRef);
+            setEditProfilePic(url);
+        }
+    };
+
+
+
+
     useEffect(() => {
         const fetchUserData = async () => {
             const auth = getAuth();
@@ -58,7 +90,7 @@ function EditProfile({navigation}) {
             profilePic: editProfilePic,
         });
         Alert.alert('Profile Updated!');
-        
+        navigation.navigate('Profile');
     }
 
     return (
@@ -79,10 +111,12 @@ function EditProfile({navigation}) {
                 <View style={styles.detail}>
                     <Text style={styles.label}>Favorite Verse:</Text>
                     <TextInput
-                        style={styles.valueInput}
+                        style={styles.TextInputLarge}
                         placeholder="Favorite Verse"
                         onChangeText={setEditFavouriteVerse}
                         value={editFavouriteVerse}
+                        multiline={true}
+                        numberOfLines={4}
                     />
                 </View>
                 <View style={styles.detail}>

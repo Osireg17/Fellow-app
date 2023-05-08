@@ -5,8 +5,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: 50, // Add padding to move everything up
+        justifyContent: 'center', // Add padding to move everything up
     },
     title: {
         fontSize: 38,
@@ -21,7 +20,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         marginLeft: 15,
         marginTop: 10,
-        color: '#59ADFF',
+        color: '#282C35',
     },
     input: {
         height: 50, // Increase height
@@ -44,7 +43,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingLeft: 10,
         marginTop: 5,
-        fontSize: 18, // Increase font size
+        fontSize: 14, // Increase font size
     },
     detailsContainer: {
         width: '80%',
@@ -62,10 +61,19 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         marginTop: 5,
         width: '100%',
-        fontSize: 18, // Increase font size
+        fontSize: 14, // Increase font size
+    },
+    TextInputLarge: {
+        height: 80,
+        width: '100%',
+        borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingLeft: 10,
+    marginTop: 5,
     },
     button: {
-        backgroundColor: '#59ADFF',
+        backgroundColor: '#282C35',
         borderRadius: 5,
         width: '80%',
         marginTop: 20,
