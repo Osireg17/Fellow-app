@@ -1,209 +1,8 @@
-// import { Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, SafeAreaView, ScrollView } from 'react-native';
-// import React, { useEffect, useState } from 'react';
-// import styles from '../../styles/Feeds/Bible.styles'
 
-
-// // const API_Key = 'bd20409d11afec8ec1d7a7dfebf3334a';
-
-
-
-
-
-// export default function BiblePage() {
-//   const [bibleVersions, setBibleVersions] = useState([]);
-//   const [bibleBooks, setBibleBooks] = useState([]);
-//   const [bibleChapters, setBibleChapters] = useState([]);
-//   const [selectedVersion, setSelectedVersion] = useState(null);
-//   const [selectedBook, setSelectedBook] = useState(null);
-
-//   const EnglishBibleVersions = ["YLT", "KJV", "NKJV", "WEB", "RSV", "CJB", "TS2009", "LXXE", "TLV", "NASB", "ESV", "GNV", "DRB", "NIV2011", "NIV", "NLT", "NRSVCE", "NET", "NJB1985", "AMP", "MSG", "LSV"];
-
-
-//   const getBibleVersions = async () => {
-//     try {
-//       // Map through the bibleVersions array and fetch data for each version
-//       const promises = EnglishBibleVersions.map(async (version) => {
-//         const response = await fetch(`https://bolls.life/get-books/${version}/`);
-        
-//         if (!response.ok) {
-//           throw new Error(`HTTP error! status: ${response.status}`);
-//         }
-  
-//         return await response.json(); // assuming API returns JSON
-//       });
-  
-//       // Wait for all promises to resolve
-//       const versionsData = await Promise.all(promises);
-  
-//       return versionsData;
-
-//       console.log(versionsData);
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   };
-  
-
-
-//   // const getBibleVersions = async () => {
-//   //   try {
-//   //     const response = await fetch('https://api.scripture.api.bible/v1/bibles', {
-//   //       method: 'GET',
-//   //       headers: {
-//   //         'api-key': API_Key
-//   //       },
-//   //     });
-
-//   //     const data = await response.json();
-//   //     const versions = data.data
-//   //       .filter((bible) => bible.language.id === 'eng') // filter for English bibles
-//   //       .map((bible) => ({
-//   //         id: bible.id,
-//   //         abbreviation: bible.abbreviation,
-//   //       }));
-
-//   //     setBibleVersions(versions);
-//   //     console.log(versions);
-//   //   } catch (error) {
-//   //     console.error(error);
-//   //   }
-//   // };
-
-//   // useEffect(() => {
-//   //   getBibleVersions();
-//   // }, []);
-
-//   // // function to get bible books
-//   // const getBibleBooks = async (bibleVersionId) => {
-//   //   try {
-//   //     const response = await fetch(
-//   //       `https://api.scripture.api.bible/v1/bibles/${bibleVersionId}/books`,
-//   //       {
-//   //         method: 'GET',
-//   //         headers: {
-//   //           'api-key': API_Key,
-//   //         },
-//   //       }
-//   //     );
-      
-//   //     const data = await response.json();
-//   //     const books = data.data.map((book) => ({
-//   //       id: book.id,
-//   //       name: book.name,
-//   //     }));
-
-//   //     setBibleBooks(books);
-//   //     console.log(books);
-//   //   } catch (error) {
-//   //     console.error(error);
-//   //   }
-//   // };
-
-//   // useEffect(() => {
-//   //   if (selectedVersion) {
-//   //     getBibleBooks(selectedVersion);
-//   //   }
-//   // }, [selectedVersion]);
-
-//   // // function to get bible chapters
-//   // const getBibleChapters = async (bibleVersionId, bibleBookId) => {
-//   //   try {
-//   //     const response = await fetch(
-//   //       `https://api.scripture.api.bible/v1/bibles/${bibleVersionId}/books/${bibleBookId}/chapters`,
-//   //       {
-//   //         method: 'GET',
-//   //         headers: {
-//   //           'api-key': API_Key,
-//   //         },
-//   //       }
-//   //     );
-//   //     const data = await response.json();
-//   //     const chapters = data.data.map((chapter) => ({
-//   //       id: chapter.id,
-//   //       number: chapter.number,
-//   //     }));
-    
-//   //     setBibleChapters(chapters);
-//   //     console.log(chapters);
-//   //   } catch (error) {
-//   //     console.error(error);
-//   //   }
-//   // };
-
-//   // useEffect(() => {
-//   //   if (selectedBook && selectedVersion) {
-//   //     getBibleChapters(selectedVersion, selectedBook);
-//   //   }
-//   // }, [selectedBook, selectedVersion]);
-
-//   // //function to get bible verses
-
-
-//   // // function to handle bible version selection and get bible books
-
-//   // const handleVersionSelection = (bibleVersionId) => {
-//   //   setSelectedVersion(bibleVersionId);
-//   //   getBibleBooks(bibleVersionId);
-//   // };
-
-//   // // function to handle bible book selection and get bible chapters
-//   // const handleBookSelection = (bibleBookId) => {
-//   //   setSelectedBook(bibleBookId);
-//   //   getBibleChapters(selectedVersion, bibleBookId);
-//   // };
-
-
-  
-
-
-
-//   return (
-//     // <ScrollView style={styles.container}>
-//     //   <Text style={styles.header}>Bible Versions</Text>
-//     //   {bibleVersions.map((bible) => (
-//     //     <Text
-//     //       key={bible.id}
-//     //       style={styles.item}
-//     //       onPress={() => handleVersionSelection(bible.id)}
-//     //     >
-//     //       {bible.abbreviation}
-//     //     </Text>
-//     //   ))}
-
-//     //   {selectedVersion && (
-//     //     <>
-//     //       <Text style={styles.header}>Books</Text>
-//     //       {bibleBooks.map((book) => (
-//     //         <Text
-//     //           key={book.id}
-//     //           style={styles.item}
-//     //           onPress={() => handleBookSelection(book.id)}
-//     //         >
-//     //           {book.name}
-//     //         </Text>
-//     //       ))}
-//     //     </>
-//     //   )}
-
-//     //   {selectedBook && (
-//     //     <>
-//     //       <Text style={styles.header}>Chapters</Text>
-//     //       {bibleChapters.map((chapter) => (
-//     //         <Text key={chapter.id} style={styles.item}>
-//     //           {chapter.number}
-//     //         </Text>
-//     //       ))}
-//     //     </>
-//     //   )}
-//     // </ScrollView>
-//     <View>
-//       <Text>hello</Text>
-//     </View>
-//   );
-// }
 import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, FlatList } from 'react-native';
 import styles from '../../styles/Feeds/Bible.styles'
+import { Header as HeaderRNE } from 'react-native-elements';
 
 const EnglishBibleVersions = ["YLT", "KJV", "NKJV", "WEB", "RSV", "CJB", "TS2009", "LXXE", "TLV", "NASB", "ESV", "GNV", "DRB", "NIV2011", "NIV", "NLT", "NRSVCE", "NET", "NJB1985", "AMP", "MSG", "LSV"];
 
@@ -211,6 +10,13 @@ export default function BiblePage() {
   const [versionsData, setVersionsData] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [booksData, setBooksData] = useState([]);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [selectedChapters, setSelectedChapters] = useState([]);
+  const [versesData, setVersesData] = useState([]);
+  const [selectedBookId, setSelectedBookId] = useState(null);
+  const [selectedChapter, setSelectedChapter] = useState(null);
+
+
 
   useEffect(() => {
     const getBibleVersions = async () => {
@@ -229,43 +35,113 @@ export default function BiblePage() {
     getBibleVersions();
   }, []);
 
-  const handleVersionPress = async (version) => {
+  const handleVersionPress = async (version: any) => {
     try {
       const response = await fetch(version.url);
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const data = await response.json();
+      console.log("Received data from fetch:", data); // Debugging line
+  
       setSelectedVersion(version.version);
       setBooksData(data);
+  
+      console.log("Set state: selectedVersion =", version.version, "; booksData =", data); // Debugging line
     } catch (error) {
       console.error(error);
     }
   };
+  
 
-  const renderVersion = ({ item }) => (
+  const handleBookPress = (book: any) => {
+    setSelectedBook(book.name);
+    setSelectedBookId(book.bookid);  // Set the selectedBookId state here
+    
+    // Create an array of chapters from 1 to book.chapters
+    const chaptersArray = Array.from({length: book.chapters}, (_, i) => i + 1);
+    
+    setSelectedChapters(chaptersArray);
+  };
+
+  const handleChapterPress = async (chapterNumber: Number) => {
+    setSelectedChapter(chapterNumber);
+    try {
+      const response = await fetch(`https://bolls.life/get-text/${selectedVersion}/${selectedBookId}/${chapterNumber}/`);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      setVersesData(data);
+      console.log("Received data from fetch:", data); // Debugging line
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  
+  
+
+  const renderVersion = ({ item}) => (
     <TouchableOpacity style={styles.versionContainer} onPress={() => handleVersionPress(item)}>
       <Text style={styles.versionText}>{item.version}</Text>
     </TouchableOpacity>
   );
 
   const renderBook = ({ item }) => (
-    <View style={styles.bookContainer}>
+    <TouchableOpacity style={styles.bookContainer} onPress={() => handleBookPress(item)}>
       <Text style={styles.bookText}>{item.name}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
+  const renderChapter = ({ item }) => (
+    <TouchableOpacity style={styles.chapterContainer} onPress={() => handleChapterPress(item)}>
+      <Text style={styles.chapterText}>{item}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderVerse = ({ item }) => (
+    <View style={styles.verseContainer}>
+      <Text style={styles.verseNumber}>{item.verse}</Text>
+      <Text style={styles.verseText}>{item.text}</Text>
+      {item.comment && <Text style={styles.verseComment}>{item.comment}</Text>}
+    </View>
+  );
+  
+  
+  
+  
   return (
     <View style={styles.container}>
-      {selectedVersion ? (
+      {selectedVersion && !selectedBook ? (
         <View>
           <Text>{selectedVersion}</Text>
           <FlatList 
             data={booksData} 
             renderItem={renderBook} 
-            keyExtractor={(item) => item.name} 
+            keyExtractor={(item) => item.bookid.toString()}
+          />
+        </View>
+      ) : selectedBook && !selectedChapter ? (
+        <View>
+          <Text>{selectedBook}</Text>
+          <FlatList 
+            data={selectedChapters} 
+            renderItem={renderChapter} 
+            keyExtractor={(item, index) => index.toString()} 
+          />
+        </View>
+      ) : selectedChapter ? (
+        <View>
+          <Text>{selectedBook} - Chapter {selectedChapter}</Text>
+          <FlatList 
+            data={versesData} 
+            renderItem={renderVerse} 
+            keyExtractor={(item) => item.pk.toString()} 
           />
         </View>
       ) : (
@@ -277,5 +153,8 @@ export default function BiblePage() {
       )}
     </View>
   );
+
+  
 }
+
 
