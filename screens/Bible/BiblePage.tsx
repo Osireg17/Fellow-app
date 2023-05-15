@@ -1,12 +1,43 @@
 
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, FlatList } from 'react-native';
+import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, SafeAreaView, Modal, ScrollView } from 'react-native';
 import styles from '../../styles/Feeds/Bible.styles'
 import { Header as HeaderRNE } from 'react-native-elements';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const EnglishBibleVersions = ["YLT", "KJV", "NKJV", "WEB", "RSV", "CJB", "TS2009", "LXXE", "TLV", "NASB", "ESV", "GNV", "DRB", "NIV2011", "NIV", "NLT", "NRSVCE", "NET", "NJB1985", "AMP", "MSG", "LSV"];
 
-export default function BiblePage() {
+
+
+function Header({ selectedVersion, onPressVersion }) {
+  const navigation = useNavigation();
+
+  return (
+    <HeaderRNE
+      containerStyle={styles.header}
+      leftComponent={{ icon: 'arrow-back', color: '#000', onPress: () => navigation.goBack() }}
+      centerComponent={{
+        text: (
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Pressable style={styles.leftbutton} onPress={() => { /* Your action here */ }}>
+              <Text style={styles.buttonText}>Proverbs3</Text>
+            </Pressable>
+            <Pressable style={styles.rightbutton} onPress={onPressVersion}>
+              <Text style={styles.buttonText}>{selectedVersion}</Text>
+            </Pressable>
+          </View>
+        ), 
+        style: { color: '#000' } 
+      }}
+      rightComponent={{ icon: 'search', color: '#000', onPress: () => { /* Your action here */ }}}
+    />
+  );
+}
+
+
+function GetBible() {
   const [versionsData, setVersionsData] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [booksData, setBooksData] = useState([]);
@@ -83,9 +114,6 @@ export default function BiblePage() {
     }
   };
   
-  
-  
-
   const renderVersion = ({ item}) => (
     <TouchableOpacity style={styles.versionContainer} onPress={() => handleVersionPress(item)}>
       <Text style={styles.versionText}>{item.version}</Text>
@@ -111,50 +139,50 @@ export default function BiblePage() {
       {item.comment && <Text style={styles.verseComment}>{item.comment}</Text>}
     </View>
   );
-  
-  
-  
-  
-  return (
-    <View style={styles.container}>
-      {selectedVersion && !selectedBook ? (
-        <View>
-          <Text>{selectedVersion}</Text>
-          <FlatList 
-            data={booksData} 
-            renderItem={renderBook} 
-            keyExtractor={(item) => item.bookid.toString()}
-          />
-        </View>
-      ) : selectedBook && !selectedChapter ? (
-        <View>
-          <Text>{selectedBook}</Text>
-          <FlatList 
-            data={selectedChapters} 
-            renderItem={renderChapter} 
-            keyExtractor={(item, index) => index.toString()} 
-          />
-        </View>
-      ) : selectedChapter ? (
-        <View>
-          <Text>{selectedBook} - Chapter {selectedChapter}</Text>
-          <FlatList 
-            data={versesData} 
-            renderItem={renderVerse} 
-            keyExtractor={(item) => item.pk.toString()} 
-          />
-        </View>
-      ) : (
-        <FlatList 
-          data={versionsData} 
-          renderItem={renderVersion} 
-          keyExtractor={(item) => item.version} 
-        />
-      )}
-    </View>
-  );
+}
 
+
+
+
+export default function BiblePage() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedVersion, setSelectedVersion] = useState('NIV');
+
+  const handleVersionPress = (version) => {
+    setSelectedVersion(version);
+    setModalVisible(false);
+  };
   
+
+    return (
+    <SafeAreaProvider>
+      <Header selectedVersion={selectedVersion} onPressVersion={() => setModalVisible(true)} />
+      <Modal
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <SafeAreaView style={styles.modalView}>
+          <ScrollView contentContainerStyle={styles.modalContent}>
+            {/* Add text that says pick a version */}
+            <Text style={styles.modalTitle}>Pick a version</Text>
+            {EnglishBibleVersions.map((version) => (
+              <TouchableOpacity key={version} onPress={() => handleVersionPress(version)}>
+                <Text style={styles.modalText}>{version}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <Pressable
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => setModalVisible(!modalVisible)}>
+            <Text style={styles.textStyle}>Close</Text>
+          </Pressable>
+        </SafeAreaView>
+      </Modal>
+    </SafeAreaProvider>
+  );
 }
 
 
