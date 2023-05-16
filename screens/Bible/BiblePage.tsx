@@ -7,11 +7,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-const EnglishBibleVersions = ["YLT", "KJV", "NKJV", "WEB", "RSV", "CJB", "TS2009", "LXXE", "TLV", "NASB", "ESV", "GNV", "DRB", "NIV2011", "NIV", "NLT", "NRSVCE", "NET", "NJB1985", "AMP", "MSG", "LSV"];
 
 
 
-function Header({ selectedVersion, onPressVersion }) {
+function Header({ selectedVersion, selectedBook, onPressVersion, onPressBook }) {
   const navigation = useNavigation();
 
   return (
@@ -21,8 +20,8 @@ function Header({ selectedVersion, onPressVersion }) {
       centerComponent={{
         text: (
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-            <Pressable style={styles.leftbutton} onPress={() => { /* Your action here */ }}>
-              <Text style={styles.buttonText}>Proverbs3</Text>
+            <Pressable style={styles.leftbutton} onPress={onPressBook}>
+              <Text style={styles.buttonText}>{selectedBook}</Text>
             </Pressable>
             <Pressable style={styles.rightbutton} onPress={onPressVersion}>
               <Text style={styles.buttonText}>{selectedVersion}</Text>
@@ -37,15 +36,24 @@ function Header({ selectedVersion, onPressVersion }) {
 }
 
 
-function GetBible() {
+
+
+export default function BiblePage() {
+
+  const EnglishBibleVersions = ["YLT", "KJV", "NKJV", "WEB", "RSV", "CJB", "TS2009", "LXXE", "TLV", "NASB", "ESV", "GNV", "DRB", "NIV2011", "NIV", "NLT", "NRSVCE", "NET", "NJB1985", "AMP", "MSG", "LSV"];
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisibleBook, setModalVisibleBook] = useState(false);
+  const [modalVisibleChapter, setModalVisibleChapter] = useState(false);
+  const [selectedVersion, setSelectedVersion] = useState('NIV');
+  const [selectedBook, setSelectedBook] = useState('Genesis');
+  const [selectedChapter, setSelectedChapter] = useState('1');
+
   const [versionsData, setVersionsData] = useState([]);
-  const [selectedVersion, setSelectedVersion] = useState(null);
   const [booksData, setBooksData] = useState([]);
-  const [selectedBook, setSelectedBook] = useState(null);
   const [selectedChapters, setSelectedChapters] = useState([]);
   const [versesData, setVersesData] = useState([]);
   const [selectedBookId, setSelectedBookId] = useState(null);
-  const [selectedChapter, setSelectedChapter] = useState(null);
 
 
 
@@ -68,19 +76,19 @@ function GetBible() {
 
   const handleVersionPress = async (version: any) => {
     try {
-      const response = await fetch(version.url);
-  
+      const response = await fetch(`https://bolls.life/get-books/${version}/`);
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-      console.log("Received data from fetch:", data); // Debugging line
-  
-      setSelectedVersion(version.version);
+      console.log("Received data from fetch:", data);
+
+      setSelectedVersion(version);
       setBooksData(data);
-  
-      console.log("Set state: selectedVersion =", version.version, "; booksData =", data); // Debugging line
+
+      console.log("Set state: selectedVersion =", version, "; booksData =", data);
     } catch (error) {
       console.error(error);
     }
@@ -88,6 +96,9 @@ function GetBible() {
   
 
   const handleBookPress = (book: any) => {
+    setSelectedBook(book.name);
+    setModalVisibleBook(false);
+
     setSelectedBook(book.name);
     setSelectedBookId(book.bookid);  // Set the selectedBookId state here
     
@@ -97,66 +108,29 @@ function GetBible() {
     setSelectedChapters(chaptersArray);
   };
 
-  const handleChapterPress = async (chapterNumber: Number) => {
-    setSelectedChapter(chapterNumber);
-    try {
-      const response = await fetch(`https://bolls.life/get-text/${selectedVersion}/${selectedBookId}/${chapterNumber}/`);
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      setVersesData(data);
-      console.log("Received data from fetch:", data); // Debugging line
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  
-  const renderVersion = ({ item}) => (
-    <TouchableOpacity style={styles.versionContainer} onPress={() => handleVersionPress(item)}>
-      <Text style={styles.versionText}>{item.version}</Text>
-    </TouchableOpacity>
-  );
-
-  const renderBook = ({ item }) => (
-    <TouchableOpacity style={styles.bookContainer} onPress={() => handleBookPress(item)}>
-      <Text style={styles.bookText}>{item.name}</Text>
-    </TouchableOpacity>
-  );
-
-  const renderChapter = ({ item }) => (
-    <TouchableOpacity style={styles.chapterContainer} onPress={() => handleChapterPress(item)}>
-      <Text style={styles.chapterText}>{item}</Text>
-    </TouchableOpacity>
-  );
-
-  const renderVerse = ({ item }) => (
-    <View style={styles.verseContainer}>
-      <Text style={styles.verseNumber}>{item.verse}</Text>
-      <Text style={styles.verseText}>{item.text}</Text>
-      {item.comment && <Text style={styles.verseComment}>{item.comment}</Text>}
-    </View>
-  );
-}
 
 
-
-
-export default function BiblePage() {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedVersion, setSelectedVersion] = useState('NIV');
-
-  const handleVersionPress = (version) => {
-    setSelectedVersion(version);
+  const handleSelectVersion = (version: any) => {
+    handleVersionPress(version);
     setModalVisible(false);
   };
+
+  const handleSelectBook = (book: any) => {
+    handleBookPress(book);
+    setModalVisibleBook(false);
+  };
+
   
 
-    return (
+    
+  return (
     <SafeAreaProvider>
-      <Header selectedVersion={selectedVersion} onPressVersion={() => setModalVisible(true)} />
+      <Header 
+        selectedVersion={selectedVersion} 
+        selectedBook={selectedBook} 
+        onPressVersion={() => setModalVisible(true)}
+        onPressBook={() => setModalVisibleBook(true)} 
+      />
       <Modal
         animationType="slide"
         visible={modalVisible}
@@ -166,11 +140,10 @@ export default function BiblePage() {
         }}>
         <SafeAreaView style={styles.modalView}>
           <ScrollView contentContainerStyle={styles.modalContent}>
-            {/* Add text that says pick a version */}
             <Text style={styles.modalTitle}>Pick a version</Text>
-            {EnglishBibleVersions.map((version) => (
-              <TouchableOpacity key={version} onPress={() => handleVersionPress(version)}>
-                <Text style={styles.modalText}>{version}</Text>
+            {versionsData.map((version) => (
+              <TouchableOpacity key={version.version} onPress={() => handleSelectVersion(version.version)}>
+                <Text style={styles.modalText}>{version.version}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -181,8 +154,29 @@ export default function BiblePage() {
           </Pressable>
         </SafeAreaView>
       </Modal>
+      <Modal
+        animationType="slide"
+        visible={modalVisibleBook}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisibleBook(!modalVisibleBook);
+        }}>
+        <SafeAreaView style={styles.modalView}>
+          <ScrollView contentContainerStyle={styles.modalContent}>
+            <Text style={styles.modalTitle}>Pick a book</Text>
+            {booksData.map((book) => (
+              <TouchableOpacity key={book.id} onPress={() => handleSelectBook(book)}>
+                <Text style={styles.modalText}>{book.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <Pressable
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => setModalVisibleBook(!modalVisibleBook)}>
+            <Text style={styles.textStyle}>Close</Text>
+          </Pressable>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaProvider>
   );
 }
-
-

@@ -5,6 +5,7 @@ const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   header: {
     backgroundColor: '#fff',
+    marginTop: 10,
   },
   leftbutton: {
     borderColor: '#000',
