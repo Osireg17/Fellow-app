@@ -6,7 +6,8 @@ import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
+import ModalAccordion from '../../components/ModalAccordion';
+import AccordionItem from '../../components/ModalAccordion';
 
 
 
@@ -71,8 +72,26 @@ export default function BiblePage() {
       }
     };
 
+    const getInitialBooks = async () => {
+      try {
+        const response = await fetch(`https://bolls.life/get-books/NIV/`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        setBooksData(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     getBibleVersions();
+    getInitialBooks();  // fetch the initial set of books for NIV version
   }, []);
+
 
   const handleVersionPress = async (version: any) => {
     try {
@@ -165,9 +184,10 @@ export default function BiblePage() {
           <ScrollView contentContainerStyle={styles.modalContent}>
             <Text style={styles.modalTitle}>Pick a book</Text>
             {booksData.map((book) => (
-              <TouchableOpacity key={book.id} onPress={() => handleSelectBook(book)}>
-                <Text style={styles.modalText}>{book.name}</Text>
-              </TouchableOpacity>
+              <AccordionItem key={book.id} title={book.name} onPress={() => handleSelectBook(book)}>
+                {/* Body content goes here */}
+                <Text style={styles.modalText}>This is a placeholder for the body content.</Text>
+              </AccordionItem>
             ))}
           </ScrollView>
           <Pressable
