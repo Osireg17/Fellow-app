@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   modalView: { // 10% of screen height
     backgroundColor: 'white',
     borderRadius: 20,
-    paddingHorizontal: 35,
+    paddingHorizontal: 0,
     paddingTop: 35,
     paddingBottom: 15,
     alignItems: 'center',
@@ -75,6 +75,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
+  },
+  chapterGrid: {
+    flexDirection: 'row', // Arrange children in rows
+    flexWrap: 'wrap', // Allow the rows to wrap if there are too many
+    justifyContent: 'space-around', // Distribute children evenly with space around them
+  },
+  chapterItem: {
+    margin: 5, // Margin around each grid item
+    padding: 10, // Padding inside each grid item
+    borderRadius: 5, // Rounded corners on each grid item
+    backgroundColor: '#ddd', // Background color for each grid item
   },
 });
 

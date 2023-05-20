@@ -1,13 +1,11 @@
-
-import React, { useState, useEffect } from 'react';
-import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, SafeAreaView, Modal, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {Text, View, TouchableOpacity, Alert, Pressable, SafeAreaView, Modal, ScrollView } from 'react-native';
 import styles from '../../styles/Feeds/Bible.styles'
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import ModalAccordion from '../../components/ModalAccordion';
 import AccordionItem from '../../components/ModalAccordion';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 
 
@@ -55,6 +53,11 @@ export default function BiblePage() {
   const [selectedChapters, setSelectedChapters] = useState([]);
   const [versesData, setVersesData] = useState([]);
   const [selectedBookId, setSelectedBookId] = useState(null);
+
+  const bottomSheetRef = useRef(null);
+  const bottomSheetBookRef = useRef(null);
+
+  const snapPoints = ['25%', '50%', '75%'];
 
 
 
@@ -127,6 +130,20 @@ export default function BiblePage() {
     setSelectedChapters(chaptersArray);
   };
 
+  const ChapterGrid = ({ chapters }) => {
+    const grid = [];
+    for (let i = 1; i <= chapters; i++) {
+      grid.push(
+        <Text key={i} style={styles.chapterItem}>
+          Chapter {i}
+        </Text>
+      );
+    }
+    return <View style={styles.chapterGrid}>{grid}</View>;
+  };
+  
+
+
 
 
   const handleSelectVersion = (version: any) => {
@@ -138,6 +155,7 @@ export default function BiblePage() {
     handleBookPress(book);
     setModalVisibleBook(false);
   };
+  
 
   
 
@@ -147,16 +165,15 @@ export default function BiblePage() {
       <Header 
         selectedVersion={selectedVersion} 
         selectedBook={selectedBook} 
-        onPressVersion={() => setModalVisible(true)}
-        onPressBook={() => setModalVisibleBook(true)} 
+        onPressVersion={() => bottomSheetRef.current?.expand()}
+        onPressBook={() => bottomSheetBookRef.current?.expand()} 
       />
-      <Modal
-        animationType="slide"
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
-        }}>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose={true}
+        enabledContentTapInteraction={false}>
         <SafeAreaView style={styles.modalView}>
           <ScrollView contentContainerStyle={styles.modalContent}>
             <Text style={styles.modalTitle}>Pick a version</Text>
@@ -168,35 +185,43 @@ export default function BiblePage() {
           </ScrollView>
           <Pressable
             style={[styles.button, styles.buttonClose]}
-            onPress={() => setModalVisible(!modalVisible)}>
+            onPress={() => bottomSheetRef.current?.collapse()}>
             <Text style={styles.textStyle}>Close</Text>
           </Pressable>
         </SafeAreaView>
-      </Modal>
-      <Modal
-        animationType="slide"
-        visible={modalVisibleBook}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalVisibleBook(!modalVisibleBook);
-        }}>
+      </BottomSheet>
+      <BottomSheet
+        ref={bottomSheetBookRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose={true}
+        enabledContentTapInteraction={false}>
         <SafeAreaView style={styles.modalView}>
           <ScrollView contentContainerStyle={styles.modalContent}>
             <Text style={styles.modalTitle}>Pick a book</Text>
             {booksData.map((book) => (
               <AccordionItem key={book.id} title={book.name} onPress={() => handleSelectBook(book)}>
-                {/* Body content goes here */}
-                <Text style={styles.modalText}>This is a placeholder for the body content.</Text>
+                <ChapterGrid chapters={book.chapters} />
               </AccordionItem>
-            ))}
+          ))}
           </ScrollView>
           <Pressable
             style={[styles.button, styles.buttonClose]}
-            onPress={() => setModalVisibleBook(!modalVisibleBook)}>
+            onPress={() => bottomSheetBookRef.current?.collapse()}>
             <Text style={styles.textStyle}>Close</Text>
           </Pressable>
         </SafeAreaView>
-      </Modal>
+      </BottomSheet>
     </SafeAreaProvider>
   );
 }
+
+
+
+
+
+
+
+
+
+
