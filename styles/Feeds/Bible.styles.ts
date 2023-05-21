@@ -4,11 +4,11 @@ const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     marginTop: 10,
   },
   leftbutton: {
-    borderColor: '#000',
+    borderColor: '#000000',
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 10,
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 0,
   },
   rightbutton: {
-    borderColor: '#000',
+    borderColor: '#000000',
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 10,
@@ -28,20 +28,19 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0,
   },
   buttonText: {
-    color: '#000',
+    color: '#000000',
   },
   modalText: {
     marginTop: 15,
     textAlign: "center"
   },
-  modalView: { // 10% of screen height
-    backgroundColor: 'white',
+  modalView: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     paddingHorizontal: 0,
     paddingTop: 35,
     paddingBottom: 15,
-    alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: '#000000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -49,24 +48,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 0,
-    height: '100%', // 80% of screen height
+    height: '100%',
+    justifyContent: 'space-between',
   },
   modalContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   button: {
     borderRadius: 20,
     padding: 10,
     elevation: 2,
+    alignSelf: 'center',
   },
   buttonClose: {
-    backgroundColor: '#000',
+    backgroundColor: '#000000',
     marginBottom: 15,
-    width: 120, // Reduce button width
+    width: 120,
   },
   textStyle: {
-    color: 'white',
+    color: '#FFFFFF',
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -77,19 +78,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   chapterGrid: {
-    flexDirection: 'row', // Arrange children in rows
-    flexWrap: 'wrap', // Allow the rows to wrap if there are too many
-    justifyContent: 'space-around', // Distribute children evenly with space around them
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center', // align items in the center
   },
   chapterItem: {
-    margin: 5, // Margin around each grid item
-    padding: 10, // Padding inside each grid item
-    borderRadius: 5, // Rounded corners on each grid item
-    backgroundColor: '#ddd', // Background color for each grid item
+    width: '20%', // 100 / 5 = 20% to achieve 5 items per row
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 5,
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: '#DDDDDD',
   },
 });
 
 export default styles;
+
 
 
 
