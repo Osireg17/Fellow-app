@@ -80,16 +80,18 @@ const styles = StyleSheet.create({
   chapterGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center', // align items in the center
+    justifyContent: 'space-between', // to distribute items evenly
+    padding: 10, // to give some space on the sides
   },
-  chapterItem: {
-    width: '20%', // 100 / 5 = 20% to achieve 5 items per row
+  chapterButton: {
+    width: '22%', // adjusted to accommodate for padding and margin, for 4 items per row
+    aspectRatio: 1, // to keep width and height the same, creating a square
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 5,
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#DDDDDD',
+    margin: 6,
+  },
+  chapterText: { // new style for the text inside the chapter buttons
+    fontSize: 18, // increase this as needed
   },
 });
 

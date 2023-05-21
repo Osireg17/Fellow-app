@@ -1,31 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import {Text, View, TouchableOpacity, Alert, Pressable, SafeAreaView, Modal, ScrollView } from 'react-native';
+import {Text, View, TouchableOpacity, Alert, Pressable, SafeAreaView, Modal, ScrollView, FlatList } from 'react-native';
 import styles from '../../styles/Feeds/Bible.styles'
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import AccordionItem from '../../components/AccordionItem';
 
-function Header({ selectedVersion, selectedBook, onPressVersion, onPressBook }) {
+function Header({ selectedVersion, selectedBook, selectedChapter, onPressVersion, onPressBook }) {
   const navigation = useNavigation();
 
   return (
     <HeaderRNE
       containerStyle={styles.header}
       leftComponent={{ icon: 'arrow-back', color: '#000', onPress: () => navigation.goBack() }}
-      centerComponent={{
-        text: (
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-            <Pressable style={styles.leftbutton} onPress={onPressBook}>
-              <Text style={styles.buttonText}>{selectedBook}</Text>
-            </Pressable>
-            <Pressable style={styles.rightbutton} onPress={onPressVersion}>
-              <Text style={styles.buttonText}>{selectedVersion}</Text>
-            </Pressable>
-          </View>
-        ), 
-        style: { color: '#000' } 
-      }}
+      centerComponent={
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+          <Pressable style={styles.leftbutton} onPress={onPressBook}>
+            <Text style={styles.buttonText}>{selectedBook} {selectedChapter}</Text>
+          </Pressable>
+          <Pressable style={styles.rightbutton} onPress={onPressVersion}>
+            <Text style={styles.buttonText}>{selectedVersion}</Text>
+          </Pressable>
+        </View>
+      }
       rightComponent={{ icon: 'search', color: '#000', onPress: () => { /* Your action here */ }}}
     />
   );
@@ -66,14 +63,26 @@ export default function BiblePage() {
     const getInitialBooks = async () => {
       try {
         const response = await fetch(`https://bolls.life/get-books/NIV/`);
-
+  
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+  
         const data = await response.json();
-
         setBooksData(data);
+  
+        // Find the bookId of Genesis in the booksData
+        const genesisBook = data.find(book => book.name === 'Genesis');
+  
+        if (genesisBook) {
+          // Set the selectedBookId state here
+          setSelectedBookId(genesisBook.bookid);
+  
+          // Fetch Genesis 1 text
+          handleChapterPress(genesisBook.bookid, '1');
+        } else {
+          console.error("Could not find Genesis in the books data");
+        }
       } catch (error) {
         console.error(error);
       }
@@ -102,30 +111,68 @@ export default function BiblePage() {
       console.error(error);
     }
   };
-  
-  const handleBookPress = (book: any) => {
-    setSelectedBook(book.name);
-    setModalVisibleBook(false);
 
-    setSelectedBookId(book.bookid);  // Set the selectedBookId state here
-    
-    // Create an array of chapters from 1 to book.chapters
-    const chaptersArray = Array.from({length: book.chapters}, (_, i) => i + 1);
-    
-    setSelectedChapters(chaptersArray);
+  const handleChapterPress = async (bookId: any, chapter: any) => {
+    try {
+      const response = await fetch(`https://bolls.life/get-text/${selectedVersion}/${bookId}/${chapter}/`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Received data from fetch:", data);
+
+      setSelectedChapter(chapter);
+      setVersesData(data);
+
+      console.log("Set state: selectedChapter =", chapter, "; versesData =", data);
+
+      // Close the modal here
+      setModalVisibleBook(false);
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const ChapterGrid = ({ chapters }) => {
+
+
+  
+  const handleBookPress = (book: any, chapter: any = '1') => {
+    setSelectedBook(book.name);
+    setSelectedChapter(chapter);
+  
+    // Set the selectedBookId state here
+    setSelectedBookId(book.bookid);
+  
+    // Create an array of chapters from 1 to book.chapters
+    const chaptersArray = Array.from({length: book.chapters}, (_, i) => i + 1);
+  
+    setSelectedChapters(chaptersArray);
+  };
+  
+  
+
+  const ChapterGrid = ({ chapters, bookId }) => {
     const grid = [];
     for (let i = 1; i <= chapters; i++) {
       grid.push(
-        <Text key={i} style={styles.chapterItem}>
-          <Text>{i}</Text>
-        </Text>
+        <TouchableOpacity key={i} onPress={() => {
+            handleChapterPress(bookId, i);
+          }}>
+          <View style={styles.chapterButton}>
+            <Text style={styles.chapterText}>{i}</Text>
+          </View>
+        </TouchableOpacity>
       );
     }
     return <View style={styles.chapterGrid}>{grid}</View>;
   };
+
+  
+  
+
 
   const handleSelectVersion = (version: any) => {
     handleVersionPress(version);
@@ -136,14 +183,23 @@ export default function BiblePage() {
     handleBookPress(book);
     setExpandedAccordion(null);
   };
+  
 
   return (
     <SafeAreaProvider>
       <Header 
         selectedVersion={selectedVersion} 
-        selectedBook={selectedBook} 
+        selectedBook={selectedBook}
+        selectedChapter={selectedChapter}
         onPressVersion={() => setModalVisible(true)}
         onPressBook={() => setModalVisibleBook(true)} 
+      />
+      <FlatList
+        data={versesData}
+        renderItem={({item}) => (
+          <Text>{item.text}</Text>
+        )}
+        keyExtractor={item => item.pk.toString()}  // Replace `item.id` with the appropriate key in your data
       />
       
       <Modal
@@ -188,9 +244,11 @@ export default function BiblePage() {
               id={index}
               expandedAccordion={expandedAccordion}
               setExpandedAccordion={setExpandedAccordion}
+              onPressTitle={() => handleBookPress(book)}
             >
-              <ChapterGrid chapters={book.chapters} />
+              <ChapterGrid chapters={book.chapters} bookId={book.bookid} />
             </AccordionItem>
+            
           ))}
           </ScrollView>
           <Pressable

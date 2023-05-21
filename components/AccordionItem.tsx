@@ -16,12 +16,14 @@ type AccordionItemPros = PropsWithChildren<{
   id: number;
   expandedAccordion: number | null;
   setExpandedAccordion: React.Dispatch<React.SetStateAction<number | null>>;
+  onPressTitle: (bookName: string) => void;
 }>;
 
-function AccordionItem({ children, title, id, expandedAccordion, setExpandedAccordion }: AccordionItemPros): JSX.Element {
+function AccordionItem({ children, title, id, expandedAccordion, setExpandedAccordion, onPressTitle }: AccordionItemPros): JSX.Element {
   const [expanded, setExpanded] = useState(false);
 
   const handlePress = () => {
+    onPressTitle(title);
     if (id !== expandedAccordion) {
       setExpandedAccordion(id);
     } else {
@@ -53,12 +55,15 @@ function AccordionItem({ children, title, id, expandedAccordion, setExpandedAcco
 
 
 
+
+
 const styles = StyleSheet.create({
     accordContainer: {
-        width: '100%',
+        width: '90%',
         marginVertical: 5,
         paddingHorizontal: 0,
         overflow: 'hidden',
+        marginLeft: 20,
     },
     accordHeader: {
         flexDirection: 'row',
