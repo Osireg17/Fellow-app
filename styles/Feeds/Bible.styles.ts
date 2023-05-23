@@ -93,6 +93,23 @@ const styles = StyleSheet.create({
   chapterText: { // new style for the text inside the chapter buttons
     fontSize: 18, // increase this as needed
   },
+  verseText: {
+    fontSize: 18,
+    color: 'black',
+    marginBottom: 20,
+    marginTop: 10,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  
+  centerBold: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  plainText: {
+    fontWeight: 'normal',
+  },
+
 });
 
 export default styles;

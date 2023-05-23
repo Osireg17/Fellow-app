@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {Text, View, TouchableOpacity, Alert, Pressable, SafeAreaView, Modal, ScrollView, FlatList } from 'react-native';
+import {Text, View, TouchableOpacity, Alert, Pressable, SafeAreaView, Modal, ScrollView, FlatList, Dimensions } from 'react-native';
 import styles from '../../styles/Feeds/Bible.styles'
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import AccordionItem from '../../components/AccordionItem';
+import RenderHtml from 'react-native-render-html';
+import { useRendererProps } from 'react-native-render-html';
+import { Element } from 'domhandler/lib/node';
 
 function Header({ selectedVersion, selectedBook, selectedChapter, onPressVersion, onPressBook }) {
   const navigation = useNavigation();
@@ -28,7 +31,10 @@ function Header({ selectedVersion, selectedBook, selectedChapter, onPressVersion
   );
 }
 
+
 export default function BiblePage() {
+  const windowWidth = Dimensions.get('window').width;
+
   const EnglishBibleVersions = ["YLT", "KJV", "NKJV", "WEB", "RSV", "CJB", "TS2009", "LXXE", "TLV", "NASB", "ESV", "GNV", "DRB", "NIV2011", "NIV", "NLT", "NRSVCE", "NET", "NJB1985", "AMP", "MSG", "LSV"];
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -45,6 +51,8 @@ export default function BiblePage() {
   const [selectedBookId, setSelectedBookId] = useState(null);
 
   const [expandedAccordion, setExpandedAccordion] = useState(null);
+  const [selectedVerse, setSelectedVerse] = useState(null);
+
 
   useEffect(() => {
     const getBibleVersions = async () => {
@@ -105,8 +113,6 @@ export default function BiblePage() {
 
       setSelectedVersion(version);
       setBooksData(data);
-
-      console.log("Set state: selectedVersion =", version, "; booksData =", data);
     } catch (error) {
       console.error(error);
     }
@@ -115,26 +121,37 @@ export default function BiblePage() {
   const handleChapterPress = async (bookId: any, chapter: any) => {
     try {
       const response = await fetch(`https://bolls.life/get-text/${selectedVersion}/${bookId}/${chapter}/`);
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      const data = await response.json();
+  
+      let data = await response.json();
       console.log("Received data from fetch:", data);
-
+  
+      // Manipulate the data here to modify the text field
+      data = data.map(item => {
+        const parts = item.text.split('<br/>');
+        if (parts.length > 1) {
+          return {
+            ...item,
+            text: `<p style="font-weight: bold; text-align: center;">${parts[0]}</p><br/>${parts.slice(1).join('<br/>')}`
+          };
+        }
+        return item;
+      });
+  
       setSelectedChapter(chapter);
       setVersesData(data);
-
-      console.log("Set state: selectedChapter =", chapter, "; versesData =", data);
-
+  
+  
       // Close the modal here
       setModalVisibleBook(false);
-
     } catch (error) {
       console.error(error);
     }
   };
+  
 
 
 
@@ -195,12 +212,23 @@ export default function BiblePage() {
         onPressBook={() => setModalVisibleBook(true)} 
       />
       <FlatList
-        data={versesData}
-        renderItem={({item}) => (
-          <Text>{item.text}</Text>
-        )}
-        keyExtractor={item => item.pk.toString()}  // Replace `item.id` with the appropriate key in your data
+  contentContainerStyle={{ paddingBottom: 100 }}
+  data={versesData}
+  renderItem={({item}) => (
+    <TouchableOpacity onPress={() => setSelectedVerse(item.pk)}>
+      <RenderHtml 
+        source={{ 
+          html: selectedVerse === item.pk 
+            ? `<u style="border-bottom: 1px dashed">${item.text}</u>` 
+            : item.text 
+        }} 
+        baseStyle={styles.verseText}
+        contentWidth={windowWidth}
       />
+    </TouchableOpacity>
+  )}
+  keyExtractor={item => item.pk.toString()}
+/>
       
       <Modal
         animationType="slide"
