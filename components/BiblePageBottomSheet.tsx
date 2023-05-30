@@ -5,7 +5,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 
 const BiblePageBottomSheet = forwardRef((props, ref) => {
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ['1%','15%', '45%'], []);
+  const snapPoints = useMemo(() => ['10%', '45%'], []);
 
   useImperativeHandle(ref, () => ({
     expand: () => {
@@ -15,6 +15,8 @@ const BiblePageBottomSheet = forwardRef((props, ref) => {
       bottomSheetRef.current?.collapse();
     },
   }));
+
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo'];
 
   return (
     <BottomSheet
@@ -27,6 +29,15 @@ const BiblePageBottomSheet = forwardRef((props, ref) => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Create a revelation</Text>
         </TouchableOpacity>
+        <View style={styles.colorContainer}>
+          {colors.map((color, index) => (
+            <TouchableOpacity 
+              key={index}
+              style={[styles.colorButton, {backgroundColor: color}]}
+              onPress={() => console.log(`Color ${color} selected`)} // replace with your color selection logic
+            />
+          ))}
+        </View>
       </View>
     </BottomSheet>
   );
@@ -35,7 +46,8 @@ const BiblePageBottomSheet = forwardRef((props, ref) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
-    alignItems: 'center', 
+    alignItems: 'center',
+    marginTop: 20, 
   },
   button: {
     marginTop: 20,
@@ -50,6 +62,17 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
+  }, 
+  colorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    width: '80%'
+  },
+  colorButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 4
   }
 });
 
