@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import {Text, View, TouchableOpacity, Alert, Pressable, SafeAreaView, Modal, ScrollView, FlatList, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import {Text, View, TouchableOpacity, Pressable, SafeAreaView, Modal, ScrollView, FlatList, Dimensions } from 'react-native';
 import styles from '../../styles/Feeds/Bible.styles'
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import AccordionItem from '../../components/AccordionItem';
 import RenderHtml from 'react-native-render-html';
-import { useRendererProps } from 'react-native-render-html';
-import { Element } from 'domhandler/lib/node';
+import BiblePageBottomSheet from '../../components/BiblePageBottomSheet';
 
-function Header({ selectedVersion, selectedBook, selectedChapter, onPressVersion, onPressBook }) {
+
+function Header({ selectedVersion, selectedBook, selectedChapter, onPressVersion, onPressBook }: {selectedVersion: any, selectedBook: any, selectedChapter: any, onPressVersion: any, onPressBook: any}) {
   const navigation = useNavigation();
 
   return (
@@ -39,7 +39,6 @@ export default function BiblePage() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisibleBook, setModalVisibleBook] = useState(false);
-  const [modalVisibleChapter, setModalVisibleChapter] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState('NIV');
   const [selectedBook, setSelectedBook] = useState('Genesis');
   const [selectedChapter, setSelectedChapter] = useState('1');
@@ -51,7 +50,7 @@ export default function BiblePage() {
   const [selectedBookId, setSelectedBookId] = useState(null);
 
   const [expandedAccordion, setExpandedAccordion] = useState(null);
-  const [selectedVerse, setSelectedVerse] = useState(null);
+  const [selectedVerses, setSelectedVerses] = useState([]);
 
 
   useEffect(() => {
@@ -153,9 +152,6 @@ export default function BiblePage() {
   };
   
 
-
-
-  
   const handleBookPress = (book: any, chapter: any = '1') => {
     setSelectedBook(book.name);
     setSelectedChapter(chapter);
@@ -170,7 +166,6 @@ export default function BiblePage() {
   };
   
   
-
   const ChapterGrid = ({ chapters, bookId }) => {
     const grid = [];
     for (let i = 1; i <= chapters; i++) {
@@ -187,10 +182,6 @@ export default function BiblePage() {
     return <View style={styles.chapterGrid}>{grid}</View>;
   };
 
-  
-  
-
-
   const handleSelectVersion = (version: any) => {
     handleVersionPress(version);
     setModalVisible(false);
@@ -199,6 +190,22 @@ export default function BiblePage() {
   const handleSelectBook = (book: any) => {
     handleBookPress(book);
     setExpandedAccordion(null);
+  };
+
+  const bottomSheetRef = useRef(null);
+
+  const onVersePress = (verse: any) => {
+
+    const isSelected = selectedVerses.includes(verse.pk);
+
+    if (isSelected) {
+      setSelectedVerses(selectedVerses.filter(item => item !== verse.pk));
+    } else {
+      setSelectedVerses([...selectedVerses, verse.pk]);
+    }
+
+    bottomSheetRef.current?.expand();
+    
   };
   
 
@@ -211,24 +218,25 @@ export default function BiblePage() {
         onPressVersion={() => setModalVisible(true)}
         onPressBook={() => setModalVisibleBook(true)} 
       />
-      <FlatList
-  contentContainerStyle={{ paddingBottom: 100 }}
-  data={versesData}
-  renderItem={({item}) => (
-    <TouchableOpacity onPress={() => setSelectedVerse(item.pk)}>
-      <RenderHtml 
-        source={{ 
-          html: selectedVerse === item.pk 
-            ? `<u style="border-bottom: 1px dashed">${item.text}</u>` 
-            : item.text 
-        }} 
-        baseStyle={styles.verseText}
-        contentWidth={windowWidth}
-      />
-    </TouchableOpacity>
-  )}
-  keyExtractor={item => item.pk.toString()}
-/>
+        <FlatList 
+    contentContainerStyle={{ paddingBottom: 100 }} 
+    data={versesData}
+    renderItem={({item}) => (
+      <TouchableOpacity onPress={() => onVersePress(item)}>
+        <RenderHtml 
+          source={{ 
+            html: selectedVerses.includes(item.pk) 
+            ? `<u style="border-bottom: 1px dashed">${item.text}</u><sup>${item.verse}</sup>` 
+            : `${item.text}<sup>${item.verse}</sup>` 
+          }} 
+          baseStyle={styles.verseText}
+          contentWidth={windowWidth}
+        />
+      </TouchableOpacity>
+    )}
+    keyExtractor={item => item.pk.toString()}
+  />
+
       
       <Modal
         animationType="slide"
@@ -286,7 +294,8 @@ export default function BiblePage() {
           </Pressable>
         </SafeAreaView>
       </Modal>
-
+    
+    <BiblePageBottomSheet ref={bottomSheetRef} />
     </SafeAreaProvider>
   );
 }

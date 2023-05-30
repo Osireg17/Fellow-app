@@ -96,10 +96,11 @@ const styles = StyleSheet.create({
   verseText: {
     fontSize: 18,
     color: 'black',
-    marginBottom: 20,
+    marginBottom: 10,
     marginTop: 10,
     marginLeft: 10,
     marginRight: 10,
+    textAlign: 'center',
   },
   
   centerBold: {
