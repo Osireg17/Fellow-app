@@ -51,6 +51,7 @@ export default function BiblePage() {
 
   const [expandedAccordion, setExpandedAccordion] = useState(null);
   const [selectedVerses, setSelectedVerses] = useState([]);
+  const [selectedColor, setSelectedColor] = useState('red');
 
 
   useEffect(() => {
@@ -218,24 +219,24 @@ export default function BiblePage() {
         onPressVersion={() => setModalVisible(true)}
         onPressBook={() => setModalVisibleBook(true)} 
       />
-        <FlatList 
-    contentContainerStyle={{ paddingBottom: 100 }} 
-    data={versesData}
-    renderItem={({item}) => (
-      <TouchableOpacity onPress={() => onVersePress(item)}>
-        <RenderHtml 
-          source={{ 
-            html: selectedVerses.includes(item.pk) 
-            ? `<u style="border-bottom: 1px dashed">${item.text}</u><sup>${item.verse}</sup>` 
-            : `${item.text}<sup>${item.verse}</sup>` 
-          }} 
-          baseStyle={styles.verseText}
-          contentWidth={windowWidth}
-        />
-      </TouchableOpacity>
-    )}
-    keyExtractor={item => item.pk.toString()}
-  />
+    <FlatList 
+  contentContainerStyle={{ paddingBottom: 100 }} 
+  data={versesData}
+  renderItem={({item}) => (
+    <TouchableOpacity onPress={() => onVersePress(item)}>
+      <RenderHtml 
+        source={{ 
+          html: selectedVerses.includes(item.pk) 
+          ? `<u style="border-bottom: 1px dashed; background-color: ${selectedColor};">${item.text}</u><sup>${item.verse}</sup>` 
+          : `${item.text}<sup>${item.verse}</sup>` 
+        }} 
+        baseStyle={styles.verseText}
+        contentWidth={windowWidth}
+      />
+    </TouchableOpacity>
+  )}
+  keyExtractor={item => item.pk.toString()}
+/>
 
       
       <Modal
@@ -295,7 +296,11 @@ export default function BiblePage() {
         </SafeAreaView>
       </Modal>
     
-    <BiblePageBottomSheet ref={bottomSheetRef} />
+    <BiblePageBottomSheet 
+    ref={bottomSheetRef} 
+    selectedColor={selectedColor}
+    setSelectedColor={setSelectedColor}
+  />
     </SafeAreaProvider>
   );
 }

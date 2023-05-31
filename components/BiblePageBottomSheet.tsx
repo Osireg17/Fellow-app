@@ -3,7 +3,7 @@ import React, { forwardRef, useRef, useImperativeHandle, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 
-const BiblePageBottomSheet = forwardRef((props, ref) => {
+const BiblePageBottomSheet = forwardRef(({selectedColor, setSelectedColor }, ref) => {
   const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['10%', '45%'], []);
 
@@ -32,10 +32,10 @@ const BiblePageBottomSheet = forwardRef((props, ref) => {
         <View style={styles.colorContainer}>
           {colors.map((color, index) => (
             <TouchableOpacity 
-              key={index}
-              style={[styles.colorButton, {backgroundColor: color}]}
-              onPress={() => console.log(`Color ${color} selected`)} // replace with your color selection logic
-            />
+            key={index}
+            style={[styles.colorButton, {backgroundColor: color}]}
+            onPress={() => setSelectedColor(color)} 
+          />
           ))}
         </View>
       </View>
