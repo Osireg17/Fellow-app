@@ -2,10 +2,12 @@
 import React, { forwardRef, useRef, useImperativeHandle, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
+import {useNavigation} from '@react-navigation/native'
 
-const BiblePageBottomSheet = forwardRef(({selectedColor, setSelectedColor }, ref) => {
+const BiblePageBottomSheet = forwardRef(({selectedColor, setSelectedColor, selectedVerses }, ref) => {
   const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['10%', '45%'], []);
+  const navigation = useNavigation()
 
   useImperativeHandle(ref, () => ({
     expand: () => {
@@ -26,7 +28,9 @@ const BiblePageBottomSheet = forwardRef(({selectedColor, setSelectedColor }, ref
       enablePanDownToClose={true}
     >
       <View style={styles.container}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button}
+        onPress={() => navigation.navigate('BiblePost', {selectedVerses})}
+        >
           <Text style={styles.buttonText}>Create a revelation</Text>
         </TouchableOpacity>
         <View style={styles.colorContainer}>

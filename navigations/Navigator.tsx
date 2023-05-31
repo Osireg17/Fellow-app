@@ -22,12 +22,22 @@ import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, Fo
 
 import { auth } from '../config/firebase'
 import ForgotPassword from '../screens/Authentication/ForgotPassword'
+import BiblePost from '../screens/Bible/BiblePost'
 
 const AuthenticatedUserContext = createContext({});
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+
+function BibleStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="BiblePage" component={BiblePage} />
+      <Stack.Screen name="BiblePost" component={BiblePost} />
+    </Stack.Navigator>
+  );
+}
 
 function CustomDrawerContent(props) {
   return (
@@ -112,12 +122,11 @@ function Feeds() {
       />
       <Tab.Screen
         name="Bible"
-        component={BiblePage}
+        component={BibleStackNavigator}
         options={{
-          tabBarIcon: ({ color }) => <FontAwesome5 name="bible" size={24} color={color} />,
-          headerShown: false,
-        }}
-      />
+        tabBarIcon: ({ color }) => <FontAwesome5 name="bible" size={24} color={color} />,
+        headerShown: false,
+        }}/>
       <Tab.Screen
       name="Activity"
       component={Activity}
