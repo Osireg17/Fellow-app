@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import {Text, View, TouchableOpacity, Pressable, SafeAreaView, Modal, ScrollView, FlatList, Dimensions } from 'react-native';
+import {Text, View, TouchableOpacity, Pressable, SafeAreaView, Modal, ScrollView, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import styles from '../../styles/Feeds/Bible.styles'
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -52,6 +52,7 @@ export default function BiblePage() {
   const [expandedAccordion, setExpandedAccordion] = useState(null);
   const [selectedVerses, setSelectedVerses] = useState([]);
   const [selectedColor, setSelectedColor] = useState('red');
+  const [Loading, setLoading] = useState(false);
 
 
   useEffect(() => {
@@ -101,6 +102,7 @@ export default function BiblePage() {
   }, []);
 
   const handleVersionPress = async (version: any) => {
+    setLoading(true);
     try {
       const response = await fetch(`https://bolls.life/get-books/${version}/`);
 
@@ -115,10 +117,13 @@ export default function BiblePage() {
       setBooksData(data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChapterPress = async (bookId: any, chapter: any) => {
+    setLoading(true);
     try {
       const response = await fetch(`https://bolls.life/get-text/${selectedVersion}/${bookId}/${chapter}/`);
   
@@ -149,6 +154,9 @@ export default function BiblePage() {
       setModalVisibleBook(false);
     } catch (error) {
       console.error(error);
+    }
+    finally {
+      setLoading(false);
     }
   };
   
@@ -219,26 +227,31 @@ export default function BiblePage() {
         onPressVersion={() => setModalVisible(true)}
         onPressBook={() => setModalVisibleBook(true)} 
       />
-    <FlatList 
-  contentContainerStyle={{ paddingBottom: 100 }} 
-  data={versesData}
-  renderItem={({item}) => (
-    <TouchableOpacity onPress={() => onVersePress(item)}>
-      <RenderHtml 
-        source={{ 
-          html: selectedVerses.includes(item.pk) 
-          ? `<u style="border-bottom: 1px dashed; background-color: ${selectedColor};">${item.text}</u><sup>${item.verse}</sup>` 
-          : `${item.text}<sup>${item.verse}</sup>` 
-        }} 
-        baseStyle={styles.verseText}
-        contentWidth={windowWidth}
-      />
-    </TouchableOpacity>
-  )}
-  keyExtractor={item => item.pk.toString()}
-/>
 
-      
+      {Loading ? 
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#282C35" />
+        </View>
+      : 
+        <FlatList 
+        contentContainerStyle={{ paddingBottom: 100 }} 
+        data={versesData}
+        renderItem={({item}) => (
+          <TouchableOpacity onPress={() => onVersePress(item)}>
+            <RenderHtml 
+              source={{ 
+                html: selectedVerses.includes(item.pk) 
+                ? `<u style="border-bottom: 1px dashed; background-color: ${selectedColor};">${item.text}</u><sup>${item.verse}</sup>` 
+                : `${item.text}<sup>${item.verse}</sup>` 
+              }} 
+              baseStyle={styles.verseText}
+              contentWidth={windowWidth}
+            />
+          </TouchableOpacity>
+        )}
+        keyExtractor={item => item.pk.toString()}
+      />
+      }
       <Modal
         animationType="slide"
         transparent={true}

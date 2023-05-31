@@ -110,6 +110,11 @@ const styles = StyleSheet.create({
   plainText: {
     fontWeight: 'normal',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
 });
 
