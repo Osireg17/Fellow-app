@@ -215,6 +215,7 @@ export default function BiblePage() {
 
     bottomSheetRef.current?.expand();
     
+    
   };
   
 
@@ -313,6 +314,7 @@ export default function BiblePage() {
     ref={bottomSheetRef} 
     selectedColor={selectedColor}
     setSelectedColor={setSelectedColor}
+    selectedVerses={selectedVerses}
   />
     </SafeAreaProvider>
   );
