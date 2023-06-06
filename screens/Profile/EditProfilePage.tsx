@@ -57,9 +57,6 @@ function EditProfile({navigation}) {
         }
     };
 
-
-
-
     useEffect(() => {
         const fetchUserData = async () => {
             const auth = getAuth();

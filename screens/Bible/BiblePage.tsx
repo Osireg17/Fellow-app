@@ -105,14 +105,11 @@ export default function BiblePage() {
     setLoading(true);
     try {
       const response = await fetch(`https://bolls.life/get-books/${version}/`);
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       console.log("Received data from fetch:", data);
-
       setSelectedVersion(version);
       setBooksData(data);
     } catch (error) {
@@ -126,14 +123,11 @@ export default function BiblePage() {
     setLoading(true);
     try {
       const response = await fetch(`https://bolls.life/get-text/${selectedVersion}/${bookId}/${chapter}/`);
-  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
       let data = await response.json();
       console.log("Received data from fetch:", data);
-  
       // Manipulate the data here to modify the text field
       data = data.map(item => {
         const parts = item.text.split('<br/>');
@@ -145,11 +139,8 @@ export default function BiblePage() {
         }
         return item;
       });
-  
       setSelectedChapter(chapter);
       setVersesData(data);
-  
-  
       // Close the modal here
       setModalVisibleBook(false);
     } catch (error) {
@@ -160,7 +151,6 @@ export default function BiblePage() {
     }
   };
   
-
   const handleBookPress = (book: any, chapter: any = '1') => {
     setSelectedBook(book.name);
     setSelectedChapter(chapter);
@@ -204,19 +194,20 @@ export default function BiblePage() {
   const bottomSheetRef = useRef(null);
 
   const onVersePress = (verse: any) => {
-
-    const isSelected = selectedVerses.includes(verse.pk);
-
+    const isSelected = selectedVerses.find(item => item.pk === verse.pk);
+  
     if (isSelected) {
-      setSelectedVerses(selectedVerses.filter(item => item !== verse.pk));
+      setSelectedVerses(selectedVerses.filter(item => item.pk !== verse.pk));
     } else {
-      setSelectedVerses([...selectedVerses, verse.pk]);
+      // add the verse.pk and the verse.text to the selectedVerses array
+      setSelectedVerses([...selectedVerses, { pk: verse.pk, text: verse.text }]);
     }
-
+  
     bottomSheetRef.current?.expand();
     
-    
+    console.log("Selected verses:", selectedVerses);
   };
+  
   
 
   return (
@@ -240,14 +231,18 @@ export default function BiblePage() {
         renderItem={({item}) => (
           <TouchableOpacity onPress={() => onVersePress(item)}>
             <RenderHtml 
-              source={{ 
-                html: selectedVerses.includes(item.pk) 
-                ? `<u style="border-bottom: 1px dashed; background-color: ${selectedColor};">${item.text}</u><sup>${item.verse}</sup>` 
-                : `${item.text}<sup>${item.verse}</sup>` 
-              }} 
-              baseStyle={styles.verseText}
-              contentWidth={windowWidth}
-            />
+  source={{ 
+    html: selectedVerses.find(verse => verse.pk === item.pk) 
+    ? item.text.includes('<sup>') 
+      ? `<u style="border-bottom: 1px dashed; background-color: ${selectedColor};">${item.text.split('<sup>')[0]}</u><sup>${item.text.split('<sup>')[1]}</sup>` 
+      : `<u style="border-bottom: 1px dashed; background-color: ${selectedColor};">${item.text}</u>`
+    : `${item.text}<sup>${item.verse}</sup>` 
+  }} 
+  baseStyle={styles.verseText}
+  contentWidth={windowWidth}
+/>
+
+
           </TouchableOpacity>
         )}
         keyExtractor={item => item.pk.toString()}
