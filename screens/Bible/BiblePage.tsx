@@ -200,12 +200,12 @@ export default function BiblePage() {
       setSelectedVerses(selectedVerses.filter(item => item.pk !== verse.pk));
     } else {
       // add the verse.pk and the verse.text to the selectedVerses array
-      setSelectedVerses([...selectedVerses, { pk: verse.pk, text: verse.text }]);
+      setSelectedVerses([...selectedVerses, { pk: verse.pk, text: verse.text, book: selectedBook, chapter: selectedChapter, verse: verse.verse }]);
     }
   
     bottomSheetRef.current?.expand();
     
-    console.log("Selected verses:", selectedVerses);
+    console.log("Selected Book:", selectedBook);
   };
   
   
@@ -305,12 +305,12 @@ export default function BiblePage() {
         </SafeAreaView>
       </Modal>
     
-    <BiblePageBottomSheet 
-    ref={bottomSheetRef} 
-    selectedColor={selectedColor}
-    setSelectedColor={setSelectedColor}
-    selectedVerses={selectedVerses}
-  />
+      <BiblePageBottomSheet 
+        ref={bottomSheetRef} 
+        selectedColor={selectedColor}
+        setSelectedColor={setSelectedColor}
+        selectedVerses={selectedVerses}
+      />
     </SafeAreaProvider>
   );
 }
