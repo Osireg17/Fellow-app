@@ -109,7 +109,7 @@ export default function BiblePage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log("Received data from fetch:", data);
+      // console.log("Received data from fetch:", data);
       setSelectedVersion(version);
       setBooksData(data);
     } catch (error) {
@@ -127,7 +127,7 @@ export default function BiblePage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       let data = await response.json();
-      console.log("Received data from fetch:", data);
+      // console.log("Received data from fetch:", data);
       // Manipulate the data here to modify the text field
       data = data.map(item => {
         const parts = item.text.split('<br/>');
@@ -205,7 +205,7 @@ export default function BiblePage() {
   
     bottomSheetRef.current?.expand();
     
-    console.log("Selected Book:", selectedBook);
+    // console.log("Selected Book:", selectedBook);
   };
   
   

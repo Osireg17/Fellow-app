@@ -16,7 +16,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {auth} from '../../config/firebase'
-import * as AppleAuthentication from 'expo-apple-authentication';
 import {database} from '../../config/firebase'
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 
