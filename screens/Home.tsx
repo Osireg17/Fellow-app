@@ -13,51 +13,15 @@ import {
 } from 'react-native';
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { FontAwesome, Feather } from '@expo/vector-icons';
+import { FontAwesome, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { database } from '../config/firebase';
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, onSnapshot, query, updateDoc} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import styles from "../styles/Home.style"
 import DropDownPicker from 'react-native-dropdown-picker';
 
-// const FirstRoute = ({publicPosts}) => (
-//   <View style={[styles.scene, { backgroundColor: '#EDEDED' }]}>
-//     <ScrollView>
-//       {publicPosts.map((post, index) => {
-//         return (
-//           <View key={index} style={styles.postContainer}>
-//             <Text style={styles.postUserOpinion}>{post.userOpinion}</Text>
-//             <Text style={styles.postTimestamp}>{post.timestamp}</Text>
-//             <View style={styles.postBibleInformation}>
-//               {post.BibleInformation.map((info, infoIndex) => {
-//                 return (
-//                   <Text key={infoIndex} style={styles.postBibleText}>
-//                     Book: {info.BibleBook}, Chapter: {info.BibleChapter}, Verse: {info.BibleVerse}, Text: {info.BibleText}
-//                   </Text>
-//                 );
-//               })}
-//             </View>
-//             <View style={styles.postStats}>
-//               <Text style={styles.postStatsText}>Praises: {post.praises}</Text>
-//               <Text style={styles.postStatsText}>Comments: {post.comments}</Text>
-//             </View>
-//           </View>
-//         );
-//       })}
-//     </ScrollView>
-//   </View>
-// );
 
-
-// const SecondRoute = () => (
-//   <View style={[styles.scene, { backgroundColor: '#EDEDED' }]} />
-// );
-
-// const renderScene = SceneMap({
-//   first: FirstRoute,
-//   second: SecondRoute,
-// });
 
 async function fetchProfilePicture(uid) {
   try {
@@ -77,15 +41,27 @@ async function fetchProfilePicture(uid) {
 }
 
 // I want a function that will return all of the posts from every user in the database regardless of whether or not the user is following them
-async function getAllPublicPosts() {
-  const posts = [];
+// async function getAllPublicPosts() {
+//   const posts = [];
   
-  const querySnapshot = await getDocs(collection(database, "publicPosts"));
-  querySnapshot.forEach((doc) => {
-    posts.push(doc.data());
-  });
+//   const querySnapshot = await getDocs(collection(database, "publicPosts"));
+//   querySnapshot.forEach((doc) => {
+//     posts.push(doc.data());
+//   });
 
-  return posts;
+//   return posts;
+// }
+
+function getAllPublicPosts(setPublicPosts) {
+  const q = query(collection(database, "publicPosts"));
+
+  return onSnapshot(q, (querySnapshot) => {
+    const posts = [];
+    querySnapshot.forEach((doc) => {
+      posts.push({ ...doc.data(), id: doc.id });
+    });
+    setPublicPosts(posts);
+  });
 }
 
 
@@ -135,11 +111,10 @@ export default function MainFeed({navigation}) {
     setSearchBarVisible(true);
   };
 
+  
   useEffect(() => {
-    getAllPublicPosts().then((fetchedPosts) => {
-      setPublicPosts(fetchedPosts);
-      console.log('Fetched posts:', fetchedPosts);
-    });
+    const unsubscribe = getAllPublicPosts(setPublicPosts);
+    return unsubscribe; // to unsubscribe from real-time updates when the component unmounts
   }, []);
   
 
@@ -149,36 +124,98 @@ export default function MainFeed({navigation}) {
 
   const layout = useWindowDimensions();
 
+  const PostStats = ({ post, onPraiseUpdate, onCommentClick }) => {
+    const [praises, setPraises] = useState(post.praises);
+    const [liked, setLiked] = useState(false);
+  
+    const handleLikePress = async () => {
+      if (!liked) {
+        await updateDoc(doc(database, "publicPosts", post.id), {
+          praises: post.praises + 1,
+        });
+        setPraises(post.praises + 1);
+        setLiked(true);
+      } else {
+        await updateDoc(doc(database, "publicPosts", post.id), {
+          praises: post.praises - 1,
+        });
+        setPraises(post.praises - 1);
+        setLiked(false);
+      }
+    };
+  
+    useEffect(() => {
+      setLiked(post.liked);
+      setPraises(post.praises);
+    }, [post]);
+  
+    return (
+      <View style={styles.postStats}>
+        <TouchableOpacity onPress={handleLikePress}>
+          <View style={styles.iconContainer}>
+            <FontAwesome
+              name={liked ? "heart" : "heart-o"}
+              size={24}
+              color={liked ? "red" : "black"}
+              style={styles.icon}
+            />
+            <Text style={styles.postStatsText}>{praises}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onCommentClick}>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name="message-badge-outline"
+              size={24}
+              color="black"
+              style={styles.icon}
+            />
+            <Text style={styles.postStatsText}>{post.comments}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  
   const FirstRoute = ({publicPosts}) => (
     <View style={[styles.scene, { backgroundColor: '#EDEDED' }]}>
       <ScrollView>
         {publicPosts.map((post, index) => {
           return (
             <View key={index} style={styles.postContainer}>
-              <View style={styles.postBibleInformation}>
-                {post.BibleInformation.map((info, infoIndex) => {
-                  return (
-                    <Text key={infoIndex} style={styles.postBibleReference}>
+              <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
+              {post.BibleInformation.map((info, infoIndex) => {
+                return (
+                  <View key={infoIndex} style={styles.postBibleInformation}>
+                    <Text style={styles.postBibleReference}>
                       {info.BibleBook} {info.BibleChapter}:{info.BibleVerse}
-                      {"\n"}
-                      {"\n"}
-                      {info.BibleText}
                     </Text>
-                  );
-                })}
-              </View>
+                    <Text style={styles.postBibleText}>
+                      "{info.BibleText}"
+                    </Text>
+                  </View>
+                );
+              })}
               <Text style={styles.postUserOpinion}>{post.userOpinion}</Text>
               <Text style={styles.postTimestamp}>{post.timestamp}</Text>
-              <View style={styles.postStats}>
-                <Text style={styles.postStatsText}>Praises: {post.praises}</Text>
-                <Text style={styles.postStatsText}>Comments: {post.comments}</Text>
-              </View>
+              <PostStats
+                post={post}
+                onPraiseUpdate={(updatedPraises) => {
+                  publicPosts[index].praises = updatedPraises;
+                  setPublicPosts([...publicPosts]);
+                }}
+                onCommentClick={() => {
+                  navigation.navigate('Comments', { post });
+                }}
+              />
             </View>
           );
         })}
       </ScrollView>
     </View>
   );
+  
   
   
   const SecondRoute = () => (

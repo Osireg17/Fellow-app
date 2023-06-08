@@ -10,6 +10,7 @@ import RNPickerSelect from "react-native-picker-select";
 
 function BiblePost({route, navigation}) {
     const { selectedVerses } = route.params;
+    const [userOpinionTitle, setUserOpinionTitle] = useState("");
     const [userOpinion, setUserOpinion] = useState("");
     const [postType, setPostType] = useState("");
 
@@ -37,6 +38,7 @@ function BiblePost({route, navigation}) {
             const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
             const postData = {
+                userOpinionTitle,
                 userOpinion,
                 postType,
                 BibleInformation: selectedVerses.map(verse => ({
@@ -62,26 +64,6 @@ function BiblePost({route, navigation}) {
             console.log(error);
         }
 
-        // first check if the userOpinion is empty
-        // if it is empty, then show an alert(telling the user to enter an opinion)
-        // if it is not empty, then post the opinion to the database
-        // the fields that need to be posted are:
-        // 1. userOpinion
-        // 2. postType
-        // 3. selectedVerses
-        //  3a. book
-        //  3b. chapter
-        //  3c. verse
-        //  3d. text
-        // 4. timestamp
-        // 5. uid (of the user who posted the opinion so that we can retrieve the user's name and profile picture later when we display the post)
-        // 6. praises (initially set to 0)
-        // 7. comments (initially set to 0)
-
-        // if the postType is public, then post the opinion to the public collection(This is the default, so everyone can see it, you don't need to be a connection to see it)
-        // if the postType is private, then post the opinion to the private collection(This is the case when the user wants to post an opinion only their connections can see)
-        
-        // if the post is successful, then show an alert saying "Post successful" then navigate back to the home screen
     };
     return (
         <SafeAreaView style={styles.container}>
@@ -102,11 +84,17 @@ function BiblePost({route, navigation}) {
                     ))
                 }
                 <TextInput
+                    style={styles.TitleInput}
+                    onChangeText={setUserOpinionTitle}
+                    value={userOpinionTitle}
+                    placeholder="Enter a title for your opinion..."
+                />
+                <TextInput
                     style={styles.input}
                     onChangeText={setUserOpinion}
                     value={userOpinion}
                     placeholder="Enter your opinion on the verse..."
-                    multiline
+                    multiline={true}
                 />
                <RNPickerSelect
                 onValueChange={(value) => setPostType(value)}
@@ -158,16 +146,27 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         fontSize: 18,
     },
+    TitleInput: {
+        height: 40,
+        width: '100%',
+        padding: 10,
+        backgroundColor: '#f8f8f8',
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#000',
+    },
     input: {
-        height: 200,
+        height: 100,
         width: '100%',
         marginTop: 20,
         padding: 10,
         backgroundColor: '#f8f8f8',
         borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#000',
     },
     buttonContainer: {
-        marginTop: 20,
+        marginTop: 40,
         backgroundColor: '#000',
         padding: 10,
         borderRadius: 5,
@@ -191,7 +190,8 @@ const pickerSelectStyles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 4,
         color: 'black',
-        paddingRight: 30 // to ensure the text is never behind the icon
+        paddingRight: 30, // to ensure the text is never behind the icon
+        marginTop: 20,
     },
     // Similar styling for Android
     inputAndroid: {
@@ -202,7 +202,8 @@ const pickerSelectStyles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 4,
         color: 'black',
-        paddingRight: 30 // to ensure the text is never behind the icon
+        paddingRight: 30,
+        marginTop: 20, // to ensure the text is never behind the icon
     },
 });
 

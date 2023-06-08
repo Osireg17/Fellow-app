@@ -53,8 +53,8 @@ export default StyleSheet.create({
   },
   dropdownContainer: {
     position: 'absolute',
-    zIndex: 9999, // Ensure it is above other elements
-    top: 0, // Adjust this value to position the dropdown correctly
+    zIndex: 9999,
+    top: 0,
     left: 10,
     borderColor: "transparent"
   },
@@ -64,9 +64,9 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    width: '110%', // Increase the width percentage
+    width: '110%',
     marginRight: 10,
-    marginLeft: -20, // Add a negative margin on the left side to move it over
+    marginLeft: -20,
     height: 20,
   },
   postContainer: {
@@ -77,43 +77,52 @@ export default StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
   },
-  
+  postTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    marginBottom: 10,
+  },
   postUserOpinion: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  
   postTimestamp: {
     fontSize: 14,
     color: '#888',
     marginBottom: 10,
   },
-  
   postBibleInformation: {
     padding: 10,
     backgroundColor: '#f8f8f8',
     borderRadius: 5,
     marginBottom: 10,
   },
-  
   postBibleText: {
     fontSize: 14,
     marginBottom: 5,
   },
   
-  postStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  postStatsText: {
-    fontSize: 14,
-    color: '#666',
-  },
   postBibleReference: {
     fontSize: 16,
     fontWeight: 'bold',
     fontStyle: 'italic',
     marginBottom: 5,
+  },
+  postStats: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: 'space-between',
+  },
+  iconContainer: {
+    flexDirection: "row",
+    marginRight: 10,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  postStatsText: {
+    marginLeft: 5,
   },
 });
