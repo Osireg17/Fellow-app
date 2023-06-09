@@ -173,8 +173,6 @@ export default function MainFeed({navigation}) {
   }, []);
   
 
-  // I want a function that will return all of the posts from every user that the current user is following
-
   const [selectedValue, setSelectedValue] = useState("home");
 
   const layout = useWindowDimensions();
@@ -192,7 +190,7 @@ export default function MainFeed({navigation}) {
                 <View style={styles.postUser}>
                   <Text style={styles.postUsername}>{post.username}</Text>
                   <Image
-                    source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
+                    source={{ uri: post.userProfilePicture || 'https://via.placeholder.com/40' }}
                     style={styles.postUserImage}
                   />
                   
@@ -229,10 +227,7 @@ export default function MainFeed({navigation}) {
       </ScrollView>
     </View>
   );
-  
-  
-  
-  
+
   const SecondRoute = () => (
     <View style={[styles.scene, { backgroundColor: '#EDEDED' }]} />
   );
@@ -247,8 +242,6 @@ export default function MainFeed({navigation}) {
         return null;
     }
   };
-
-
 
   return (
     <SafeAreaProvider>
@@ -286,19 +279,6 @@ export default function MainFeed({navigation}) {
               />
             </View>
           }
-          // rightComponent={
-          //   <View style={styles.rightComponent}>
-          //     <TouchableOpacity onPress={handleSearchIconPress}>
-          //       <FontAwesome name="search" size={24} color="black" />
-          //     </TouchableOpacity>
-          //     <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
-          //     <Image
-          //         source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
-          //         style={styles.profileImage}
-          //       />
-          //     </TouchableOpacity>
-          //   </View>
-          // }
           rightComponent={
             <View style={styles.rightComponent}>
               {searchBarVisible ? (
