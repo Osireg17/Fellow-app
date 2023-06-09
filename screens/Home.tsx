@@ -162,6 +162,8 @@ export default function MainFeed({navigation}) {
     navigation.navigate('Profile');
   }
 
+  
+
   const handleSearchIconPress = () => {
     setSearchBarVisible(true);
   };
@@ -188,12 +190,15 @@ export default function MainFeed({navigation}) {
               <View style={styles.postHeader}>
                 <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
                 <View style={styles.postUser}>
+                  <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfilePage', {uid: post.uid })}>
                   <Text style={styles.postUsername}>{post.username}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfilePage', {uid: post.uid })}>
                   <Image
                     source={{ uri: post.userProfilePicture || 'https://via.placeholder.com/40' }}
                     style={styles.postUserImage}
                   />
-                  
+                  </TouchableOpacity>
                 </View>
               </View>
               {post.BibleInformation.map((info, infoIndex) => {

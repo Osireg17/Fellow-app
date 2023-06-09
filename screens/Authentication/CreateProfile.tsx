@@ -120,7 +120,7 @@ export default function CreateProfile({ route, navigation  }) {
           church: church,
           profilePicture: profilePictureURL,
           praises: 0,
-          connections: 0,
+          connections: [],
         };
     
         const user = getAuth().currentUser;

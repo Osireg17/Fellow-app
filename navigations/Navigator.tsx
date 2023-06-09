@@ -18,6 +18,7 @@ import EditProfilePage from '../screens/Profile/EditProfilePage'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList  } from '@react-navigation/drawer';
 import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, FontAwesome } from '@expo/vector-icons';
+import OtherUserProfilePage from '../screens/Profile/OtherUserProfilePage'
 
 
 import { auth } from '../config/firebase'
@@ -58,6 +59,8 @@ function ProfileStackNavigator() {
     </ProfileStack.Navigator>
   );
 }
+
+
 
 // create a drawer navigator for the profile page
 function ProfileDrawer() {
@@ -198,6 +201,11 @@ const MainStack = () => {
           <Stack.Screen
             name="EditProfilePage"
             component={EditProfilePage}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="OtherUserProfilePage"
+            component={OtherUserProfilePage}
             options={{headerShown: false}}
           />
         </>
