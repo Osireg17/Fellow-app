@@ -16,7 +16,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FontAwesome, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { database } from '../config/firebase';
-import { doc, getDoc, collection, getDocs, onSnapshot, query, updateDoc} from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, onSnapshot, query, updateDoc, arrayUnion, arrayRemove} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import styles from "../styles/Home.style"
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -63,6 +63,61 @@ function getAllPublicPosts(setPublicPosts) {
     setPublicPosts(posts);
   });
 }
+
+const PostStats = ({ post, uid, onPraiseUpdate, onCommentClick }) => {
+  const [praises, setPraises] = useState(post.praises);
+  const [liked, setLiked] = useState(false);
+
+  const handleLikePress = async () => {
+    if (!liked) {
+      await updateDoc(doc(database, "publicPosts", post.postId), {
+        praises: arrayUnion(uid),
+      });
+      setPraises([...post.praises, uid]);
+      setLiked(true);
+    } else {
+      await updateDoc(doc(database, "publicPosts", post.postId), {
+        praises: arrayRemove(uid),
+      });
+      setPraises(post.praises.filter(praise => praise !== uid));
+      setLiked(false);
+    }
+  };
+
+  useEffect(() => {
+    setLiked(post.praises.includes(uid));
+    setPraises(post.praises);
+  }, [post]);
+
+  return (
+    <View style={styles.postStats}>
+      <TouchableOpacity onPress={handleLikePress}>
+        <View style={styles.iconContainer}>
+          <FontAwesome
+            name={liked ? "heart" : "heart-o"}
+            size={24}
+            color={liked ? "red" : "black"}
+            style={styles.icon}
+          />
+          <Text style={styles.postStatsText}>{praises.length}</Text>
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onCommentClick}>
+        <View style={styles.iconContainer}>
+          <MaterialCommunityIcons
+            name="message-badge-outline"
+            size={24}
+            color="black"
+            style={styles.icon}
+          />
+          <Text style={styles.postStatsText}>{post.comments}</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+
 
 
 export default function MainFeed({navigation}) {
@@ -124,58 +179,6 @@ export default function MainFeed({navigation}) {
 
   const layout = useWindowDimensions();
 
-  const PostStats = ({ post, onPraiseUpdate, onCommentClick }) => {
-    const [praises, setPraises] = useState(post.praises);
-    const [liked, setLiked] = useState(false);
-  
-    const handleLikePress = async () => {
-      if (!liked) {
-        await updateDoc(doc(database, "publicPosts", post.id), {
-          praises: post.praises + 1,
-        });
-        setPraises(post.praises + 1);
-        setLiked(true);
-      } else {
-        await updateDoc(doc(database, "publicPosts", post.id), {
-          praises: post.praises - 1,
-        });
-        setPraises(post.praises - 1);
-        setLiked(false);
-      }
-    };
-  
-    useEffect(() => {
-      setLiked(post.liked);
-      setPraises(post.praises);
-    }, [post]);
-  
-    return (
-      <View style={styles.postStats}>
-        <TouchableOpacity onPress={handleLikePress}>
-          <View style={styles.iconContainer}>
-            <FontAwesome
-              name={liked ? "heart" : "heart-o"}
-              size={24}
-              color={liked ? "red" : "black"}
-              style={styles.icon}
-            />
-            <Text style={styles.postStatsText}>{praises}</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onCommentClick}>
-          <View style={styles.iconContainer}>
-            <MaterialCommunityIcons
-              name="message-badge-outline"
-              size={24}
-              color="black"
-              style={styles.icon}
-            />
-            <Text style={styles.postStatsText}>{post.comments}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   
   const FirstRoute = ({publicPosts}) => (
@@ -184,7 +187,17 @@ export default function MainFeed({navigation}) {
         {publicPosts.map((post, index) => {
           return (
             <View key={index} style={styles.postContainer}>
-              <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
+              <View style={styles.postHeader}>
+                <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
+                <View style={styles.postUser}>
+                  <Text style={styles.postUsername}>{post.username}</Text>
+                  <Image
+                    source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
+                    style={styles.postUserImage}
+                  />
+                  
+                </View>
+              </View>
               {post.BibleInformation.map((info, infoIndex) => {
                 return (
                   <View key={infoIndex} style={styles.postBibleInformation}>
@@ -200,6 +213,7 @@ export default function MainFeed({navigation}) {
               <Text style={styles.postUserOpinion}>{post.userOpinion}</Text>
               <Text style={styles.postTimestamp}>{post.timestamp}</Text>
               <PostStats
+                uid={uid}
                 post={post}
                 onPraiseUpdate={(updatedPraises) => {
                   publicPosts[index].praises = updatedPraises;
@@ -215,6 +229,7 @@ export default function MainFeed({navigation}) {
       </ScrollView>
     </View>
   );
+  
   
   
   

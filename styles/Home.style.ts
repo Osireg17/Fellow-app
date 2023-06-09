@@ -125,4 +125,24 @@ export default StyleSheet.create({
   postStatsText: {
     marginLeft: 5,
   },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  postUser: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  postUserImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  postUsername: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
 });

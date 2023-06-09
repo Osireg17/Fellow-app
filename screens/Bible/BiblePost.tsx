@@ -3,10 +3,10 @@ import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, Touc
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { database } from '../../config/firebase';
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import RNPickerSelect from "react-native-picker-select";
-
+import uuid from 'react-native-uuid';
 
 function BiblePost({route, navigation}) {
     const { selectedVerses } = route.params;
@@ -19,24 +19,32 @@ function BiblePost({route, navigation}) {
             alert("Please enter an opinion and select a post type.");
             return;
         }
-
+    
         try {
             const auth = getAuth();
             const uid = auth.currentUser.uid;
 
-            // I want the timestamp to be in the format of "2021-10-10 10:10:10 and I want it to be in the user's timezone"
+            // Get the user's profile from Firestore
+        const userDoc = await getDoc(doc(database, 'user', uid));
+        if (!userDoc.exists()) {
+            console.error('User not found in database');
+            return;
+        }
 
+        const username = userDoc.data().username;
+        const userProfilePicture = userDoc.data().profilePicture;
+    
             const date = new Date();
             const year = date.getFullYear();
             const month = date.getMonth() + 1;
             const day = date.getDate();
-
+    
             const hours = date.getHours();
             const minutes = date.getMinutes();
             const seconds = date.getSeconds();
-
-            const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
+    
+            const timestamp = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+    
             const postData = {
                 userOpinionTitle,
                 userOpinion,
@@ -49,21 +57,26 @@ function BiblePost({route, navigation}) {
                 })),
                 timestamp,
                 uid,
-                praises: 0,
-                comments: 0,
+                praises: [],
+                comments: [],
+                postId: uuid.v4(),
+                username,
+                userProfilePicture,
             };
             
             const collectionPath = postType === "public" ? "publicPosts" : "privatePosts";
+    
+            const postCollection = collection(database, collectionPath);
+            const postDoc = doc(postCollection, postData.postId);
 
-            await addDoc(collection(database, collectionPath), postData);
-
+            await setDoc(postDoc, postData);
+    
             alert("Post successful");
             navigation.goBack();
-
+    
         } catch (error) {
             console.log(error);
         }
-
     };
     return (
         <SafeAreaView style={styles.container}>
