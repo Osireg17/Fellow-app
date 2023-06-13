@@ -94,7 +94,8 @@ function UserProfile() {
       </TouchableOpacity>
       <View style={styles.statsContainer}>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{connections}</Text>
+          {/* connection in the firebase database is an array of userID. Display the length of the array */}
+          <Text style={styles.statValue}>{connections.length}</Text>
           <Text style={styles.statLabel}>Connections</Text>
         </View>
         <View style={styles.stat}>

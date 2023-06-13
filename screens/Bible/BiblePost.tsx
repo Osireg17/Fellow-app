@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, Touc
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { database } from '../../config/firebase';
-import { addDoc, collection, doc, setDoc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import RNPickerSelect from "react-native-picker-select";
 import uuid from 'react-native-uuid';
@@ -34,16 +34,16 @@ function BiblePost({route, navigation}) {
         const username = userDoc.data().username;
         const userProfilePicture = userDoc.data().profilePicture;
     
-            const date = new Date();
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1;
-            const day = date.getDate();
+            // const date = new Date();
+            // const year = date.getFullYear();
+            // const month = date.getMonth() + 1;
+            // const day = date.getDate();
     
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            const seconds = date.getSeconds();
+            // const hours = date.getHours();
+            // const minutes = date.getMinutes();
+            // const seconds = date.getSeconds();
     
-            const timestamp = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+            // const timestamp = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
     
             const postData = {
                 userOpinionTitle,
@@ -55,7 +55,7 @@ function BiblePost({route, navigation}) {
                     BibleVerse: verse.verse,
                     BibleText: verse.text,
                 })),
-                timestamp,
+                createdAt: serverTimestamp(),
                 uid,
                 praises: [],
                 comments: [],

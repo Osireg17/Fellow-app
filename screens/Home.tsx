@@ -16,7 +16,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FontAwesome, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { database } from '../config/firebase';
-import { doc, getDoc, collection, getDocs, onSnapshot, query, updateDoc, arrayUnion, arrayRemove} from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, onSnapshot, query, updateDoc, arrayUnion, arrayRemove, where, orderBy} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import styles from "../styles/Home.style"
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -53,16 +53,55 @@ async function fetchProfilePicture(uid) {
 // }
 
 function getAllPublicPosts(setPublicPosts) {
-  const q = query(collection(database, "publicPosts"));
+  const q = query(
+    collection(database, "publicPosts"),
+    orderBy("createdAt", "desc"));
 
   return onSnapshot(q, (querySnapshot) => {
     const posts = [];
     querySnapshot.forEach((doc) => {
-      posts.push({ ...doc.data(), id: doc.id });
+      posts.push({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt });
     });
-    setPublicPosts(posts);
+
+    setPublicPosts(posts); // Update the state with the fetched posts
   });
 }
+
+
+function getAllPrivatePosts(setPrivatePosts) {
+  const auth = getAuth();
+  const currentUserUid = auth.currentUser.uid;
+
+  // First fetch the connections array from the current user's document
+  const currentUserDocRef = doc(database, 'user', currentUserUid);
+  
+  // Use onSnapshot to listen to changes in the user document
+  onSnapshot(currentUserDocRef, (currentUserDocSnap) => {
+    if (currentUserDocSnap.exists()) {
+      // Create a copy of the connections array and add the current user's uid to it
+      const connections = [...currentUserDocSnap.data().connections, currentUserUid];
+
+      // Then query the privatePosts collection
+      const q = query(collection(database, "privatePosts"), 
+      where("uid", "in", connections),
+      orderBy("createdAt", "desc")
+      );
+
+      // Use onSnapshot to listen to changes in the privatePosts collection
+      onSnapshot(q, (querySnapshot) => {
+        const posts = [];
+        querySnapshot.forEach((doc) => {
+          posts.push({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt });
+        });
+        
+        setPrivatePosts(posts);
+      });
+    } else {
+      console.log(`No document exists for user with uid: ${currentUserUid}`);
+    }
+  });
+}
+
 
 const PostStats = ({ post, uid, onPraiseUpdate, onCommentClick }) => {
   const [praises, setPraises] = useState(post.praises);
@@ -145,9 +184,12 @@ export default function MainFeed({navigation}) {
   ]);
   const [profilePicture, setProfilePicture] = useState('');
   const [publicPosts, setPublicPosts] = useState([]);
+  const [privatePosts, setPrivatePosts] = useState([]);
 
   const auth = getAuth();
   const uid = auth.currentUser.uid;
+
+
 
   useEffect(() => {
     fetchProfilePicture(uid).then((pictureUrl) => {
@@ -173,6 +215,11 @@ export default function MainFeed({navigation}) {
     const unsubscribe = getAllPublicPosts(setPublicPosts);
     return unsubscribe; // to unsubscribe from real-time updates when the component unmounts
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = getAllPrivatePosts(setPrivatePosts);
+    return unsubscribe; // to unsubscribe from real-time updates when the component unmounts
+  }, []);
   
 
   const [selectedValue, setSelectedValue] = useState("home");
@@ -185,15 +232,18 @@ export default function MainFeed({navigation}) {
     <View style={[styles.scene, { backgroundColor: '#EDEDED' }]}>
       <ScrollView>
         {publicPosts.map((post, index) => {
+          const createdAt = post.createdAt ? post.createdAt.toDate().toLocaleString() : '';
           return (
             <View key={index} style={styles.postContainer}>
               <View style={styles.postHeader}>
                 <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
                 <View style={styles.postUser}>
-                  <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfilePage', {uid: post.uid })}>
+                <TouchableOpacity onPress={() => {if (post.uid === uid) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: post.uid });}}}>
                   <Text style={styles.postUsername}>{post.username}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => navigation.navigate('OtherUserProfilePage', {uid: post.uid })}>
+                  <TouchableOpacity onPress={() => {if (post.uid === uid) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: post.uid });}}}>
                   <Image
                     source={{ uri: post.userProfilePicture || 'https://via.placeholder.com/40' }}
                     style={styles.postUserImage}
@@ -214,7 +264,7 @@ export default function MainFeed({navigation}) {
                 );
               })}
               <Text style={styles.postUserOpinion}>{post.userOpinion}</Text>
-              <Text style={styles.postTimestamp}>{post.timestamp}</Text>
+              <Text style={styles.postTimestamp}>{createdAt}</Text>
               <PostStats
                 uid={uid}
                 post={post}
@@ -234,7 +284,58 @@ export default function MainFeed({navigation}) {
   );
 
   const SecondRoute = () => (
-    <View style={[styles.scene, { backgroundColor: '#EDEDED' }]} />
+    <View style={[styles.scene, { backgroundColor: '#EDEDED' }]}>
+      <ScrollView>
+        {privatePosts.map((post, index) => {
+          const createdAt = post.createdAt ? post.createdAt.toDate().toLocaleString() : '';
+          return (
+            <View key={index} style={styles.postContainer}>
+              <View style={styles.postHeader}>
+                <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
+                <View style={styles.postUser}>
+                <TouchableOpacity onPress={() => {if (post.uid === uid) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: post.uid });}}}>
+                  <Text style={styles.postUsername}>{post.username}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => {if (post.uid === uid) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: post.uid });}}}>
+                  <Image
+                    source={{ uri: post.userProfilePicture || 'https://via.placeholder.com/40' }}
+                    style={styles.postUserImage}
+                  />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {post.BibleInformation.map((info, infoIndex) => {
+                return (
+                  <View key={infoIndex} style={styles.postBibleInformation}>
+                    <Text style={styles.postBibleReference}>
+                      {info.BibleBook} {info.BibleChapter}:{info.BibleVerse}
+                    </Text>
+                    <Text style={styles.postBibleText}>
+                      "{info.BibleText}"
+                    </Text>
+                  </View>
+                );
+              })}
+              <Text style={styles.postUserOpinion}>{post.userOpinion}</Text>
+              <Text style={styles.postTimestamp}>{createdAt}</Text>
+              <PostStats
+                uid={uid}
+                post={post}
+                onPraiseUpdate={(updatedPraises) => {
+                  privatePosts[index].praises = updatedPraises;
+                  setPrivatePosts([...privatePosts]);
+                }}
+                onCommentClick={() => {
+                  navigation.navigate('Comments', { post });
+                }}
+              />
+            </View>
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 
   const renderScene = ({route}) => {
