@@ -34,17 +34,6 @@ function BiblePost({route, navigation}) {
         const username = userDoc.data().username;
         const userProfilePicture = userDoc.data().profilePicture;
     
-            // const date = new Date();
-            // const year = date.getFullYear();
-            // const month = date.getMonth() + 1;
-            // const day = date.getDate();
-    
-            // const hours = date.getHours();
-            // const minutes = date.getMinutes();
-            // const seconds = date.getSeconds();
-    
-            // const timestamp = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-    
             const postData = {
                 userOpinionTitle,
                 userOpinion,
@@ -58,7 +47,7 @@ function BiblePost({route, navigation}) {
                 createdAt: serverTimestamp(),
                 uid,
                 praises: [],
-                comments: [],
+                // comments: [],
                 postId: uuid.v4(),
                 username,
                 userProfilePicture,

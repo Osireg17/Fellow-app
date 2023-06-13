@@ -19,6 +19,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList  } from '@react-navigation/drawer';
 import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, FontAwesome } from '@expo/vector-icons';
 import OtherUserProfilePage from '../screens/Profile/OtherUserProfilePage'
+import CommentsPage from '../screens/CommentsPage'
 
 
 import { auth } from '../config/firebase'
@@ -99,7 +100,7 @@ function Feeds() {
         tabBarStyle: {
           backgroundColor: '#ffffff',
           position: 'absolute',
-          height: 110,
+          height: 90,
           paddingTop: 20,
           
         },
@@ -109,7 +110,7 @@ function Feeds() {
         name="Home"
         component={Home}
         options={{
-          tabBarIcon: ({ color }) => <Octicons name="home" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Octicons name="home" size={20} color={color} />,
           headerShown: false,
         }}
       />
@@ -118,7 +119,7 @@ function Feeds() {
         component={Questions}
         options={{
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="comment-question-outline" size={24} color={color} />
+            <MaterialCommunityIcons name="comment-question-outline" size={20} color={color} />
           ),
           headerShown: false,
         }}
@@ -127,14 +128,14 @@ function Feeds() {
         name="Bible"
         component={BibleStackNavigator}
         options={{
-        tabBarIcon: ({ color }) => <FontAwesome5 name="bible" size={24} color={color} />,
+        tabBarIcon: ({ color }) => <FontAwesome5 name="bible" size={20} color={color} />,
         headerShown: false,
         }}/>
       <Tab.Screen
       name="Activity"
       component={Activity}
       options={{
-        tabBarIcon: ({ color }) => <FontAwesome name="bell-o" size={24} color={color}/>,
+        tabBarIcon: ({ color }) => <FontAwesome name="bell-o" size={20} color={color}/>,
         headerShown: false,
       }}
       />
@@ -143,7 +144,7 @@ function Feeds() {
         component={ProfilePage}
         options={{
           tabBarIcon: ({ color }) => (
-            <Ionicons name="person-circle-outline" size={28} color={color} />
+            <Ionicons name="person-circle-outline" size={26} color={color} />
           ),
           headerShown: false,
         }}
@@ -206,6 +207,11 @@ const MainStack = () => {
           <Stack.Screen
             name="OtherUserProfilePage"
             component={OtherUserProfilePage}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="CommentsPage"
+            component={CommentsPage}
             options={{headerShown: false}}
           />
         </>

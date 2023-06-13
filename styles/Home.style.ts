@@ -29,6 +29,8 @@ export default StyleSheet.create({
   },
   scene: {
     flex: 1,
+    marginHorizontal: 5,
+
   },
   indicator: {
     backgroundColor: 'black',
@@ -72,7 +74,7 @@ export default StyleSheet.create({
   postContainer: {
     backgroundColor: 'white',
     padding: 10,
-    marginVertical: 5,
+    marginVertical: 10,
     borderRadius: 10,
     borderColor: '#ccc',
     borderWidth: 1,
@@ -84,7 +86,7 @@ export default StyleSheet.create({
     marginBottom: 10,
   },
   postUserOpinion: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 10,
   },

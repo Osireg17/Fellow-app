@@ -156,9 +156,6 @@ const PostStats = ({ post, uid, onPraiseUpdate, onCommentClick }) => {
   );
 };
 
-
-
-
 export default function MainFeed({navigation}) {
 
   const [searchBarVisible, setSearchBarVisible] = useState(false);
@@ -273,7 +270,7 @@ export default function MainFeed({navigation}) {
                   setPublicPosts([...publicPosts]);
                 }}
                 onCommentClick={() => {
-                  navigation.navigate('Comments', { post });
+                  navigation.navigate('CommentsPage', { postId: post.id, post: post });
                 }}
               />
             </View>
@@ -284,7 +281,7 @@ export default function MainFeed({navigation}) {
   );
 
   const SecondRoute = () => (
-    <View style={[styles.scene, { backgroundColor: '#EDEDED' }]}>
+    <View style={[styles.scene, { backgroundColor: '#EDEDED'}]}>
       <ScrollView>
         {privatePosts.map((post, index) => {
           const createdAt = post.createdAt ? post.createdAt.toDate().toLocaleString() : '';
@@ -328,7 +325,7 @@ export default function MainFeed({navigation}) {
                   setPrivatePosts([...privatePosts]);
                 }}
                 onCommentClick={() => {
-                  navigation.navigate('Comments', { post });
+                  navigation.navigate('CommentsPage', { postId: post.id, post: post });
                 }}
               />
             </View>
@@ -354,7 +351,7 @@ export default function MainFeed({navigation}) {
       <View style={styles.container}>
         <HeaderRNE
           containerStyle={{
-            height: 120,
+            height: 100,
             paddingBottom: 30,
             paddingTop: 20,
             backgroundColor: '#FFFFFF',
