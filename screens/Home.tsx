@@ -54,7 +54,7 @@ async function fetchProfilePicture(uid) {
 
 function getAllPublicPosts(setPublicPosts) {
   const q = query(
-    collection(database, "publicPosts"),
+    collection(database, "public"),
     orderBy("createdAt", "desc"));
 
   return onSnapshot(q, (querySnapshot) => {
@@ -82,7 +82,7 @@ function getAllPrivatePosts(setPrivatePosts) {
       const connections = [...currentUserDocSnap.data().connections, currentUserUid];
 
       // Then query the privatePosts collection
-      const q = query(collection(database, "privatePosts"), 
+      const q = query(collection(database, "private"), 
       where("uid", "in", connections),
       orderBy("createdAt", "desc")
       );
@@ -103,19 +103,19 @@ function getAllPrivatePosts(setPrivatePosts) {
 }
 
 
-const PostStats = ({ post, uid, onPraiseUpdate, onCommentClick }) => {
+const PostStats = ({ post, uid, onPraiseUpdate, onCommentClick, postType }) => {
   const [praises, setPraises] = useState(post.praises);
   const [liked, setLiked] = useState(false);
 
   const handleLikePress = async () => {
     if (!liked) {
-      await updateDoc(doc(database, "publicPosts", post.postId), {
+      await updateDoc(doc(database, postType, post.postId), {
         praises: arrayUnion(uid),
       });
       setPraises([...post.praises, uid]);
       setLiked(true);
     } else {
-      await updateDoc(doc(database, "publicPosts", post.postId), {
+      await updateDoc(doc(database, postType, post.postId), {
         praises: arrayRemove(uid),
       });
       setPraises(post.praises.filter(praise => praise !== uid));
@@ -165,6 +165,7 @@ export default function MainFeed({navigation}) {
     { key: 'first', title: 'For You' },
     { key: 'second', title: 'Following' },
   ]);
+
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
@@ -272,6 +273,7 @@ export default function MainFeed({navigation}) {
                 onCommentClick={() => {
                   navigation.navigate('CommentsPage', { postId: post.id, post: post });
                 }}
+                postType={'public'}
               />
             </View>
           );
@@ -327,6 +329,7 @@ export default function MainFeed({navigation}) {
                 onCommentClick={() => {
                   navigation.navigate('CommentsPage', { postId: post.id, post: post });
                 }}
+                postType={'private'}
               />
             </View>
           );

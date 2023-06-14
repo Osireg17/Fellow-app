@@ -47,13 +47,14 @@ function BiblePost({route, navigation}) {
                 createdAt: serverTimestamp(),
                 uid,
                 praises: [],
-                // comments: [],
+                // comments as a subcollection
+                comments: [],
                 postId: uuid.v4(),
                 username,
                 userProfilePicture,
             };
             
-            const collectionPath = postType === "public" ? "publicPosts" : "privatePosts";
+            const collectionPath = postType === "public" ? "public" : "private";
     
             const postCollection = collection(database, collectionPath);
             const postDoc = doc(postCollection, postData.postId);

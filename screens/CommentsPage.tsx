@@ -19,7 +19,7 @@ function CommentsPage({route}) {
         const fetchPost  = async () => {
             // if the post is public, get it from the publicPosts collection
 
-            const publicPostDoc = await getDoc(doc(database, 'publicPosts', postId));
+            const publicPostDoc = await getDoc(doc(database, 'public', postId));
             if (publicPostDoc.exists()) {
                 setPost(publicPostDoc.data());
                 return;
@@ -27,7 +27,7 @@ function CommentsPage({route}) {
             
             // if the post is private, get it from the privatePosts collection
 
-            const privatePostDoc = await getDoc(doc(database, 'privatePosts', postId));
+            const privatePostDoc = await getDoc(doc(database, 'private', postId));
             if (privatePostDoc.exists()) {
                 setPost(privatePostDoc.data());
                 return;
@@ -73,6 +73,7 @@ function CommentsPage({route}) {
             </View>
             <Comments 
                 postId={postId}
+                postType={post.postType}
             />
         </View>
     </SafeAreaProvider>
