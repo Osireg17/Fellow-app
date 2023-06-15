@@ -7,6 +7,7 @@ import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/ve
 import { database } from '../../config/firebase';
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { useNavigation } from '@react-navigation/native';
 
 async function fetchProfilePicture(uid) {
   try {
@@ -57,42 +58,26 @@ function QuestionHeader({ navigation }) {
   return (
     <>
     <HeaderRNE
-  // leftComponent={
-  //   <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftComponent}>
-  //     <Ionicons name="arrow-back" size={24} color="black" />
-  //   </TouchableOpacity>
-  // }
-  // centerComponent={{
-  //   text: 'Questions',
-  //   style: styles.centerComponent,
-  // }}
+  leftComponent={
+    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftComponent}>
+      <Ionicons name="arrow-back" size={24} color="black" />
+    </TouchableOpacity>
+  }
+  centerComponent={{
+    text: 'Questions',
+    style: styles.centerComponent,
+  }}
   rightComponent={
     <View style={styles.rightComponent}>
-      {searchBarVisible ? (
-        <TextInput
-          style={styles.searchBar}
-          onChangeText={text => setSearchText(text)}
-          value={searchText}
-          placeholder="Search"
-          autoFocus={true}
-          onBlur={() => setSearchBarVisible(false)}
-        />
-      ) : (
-        <>
-          <TouchableOpacity onPress={handleSearchIconPress} style={styles.searchButton}>
-            <FontAwesome name="search" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.optionsButton}>
+          {/* <TouchableOpacity style={styles.optionsButton}>
             <Ionicons name="ios-options-outline" size={24} color="black" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
             <Image
               source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
               style={styles.profileImage}
             />
           </TouchableOpacity>
-        </>
-      )}
       </View>
   }
   containerStyle={styles.headerContainer}
@@ -102,15 +87,27 @@ function QuestionHeader({ navigation }) {
 }
 
 export default function Questions({navigation}) {
+
   
   const NavigateToProfile = () => {
     //complete the function to navigate to the profile page
     navigation.navigate('Profile');
   }
 
+  const NavigateToPostQuestion = () => {
+    // replace 'PostQuestion' with the route name of your question post page
+    navigation.navigate('QuestionPost');
+  }
+
   return (
     <SafeAreaProvider>
       <QuestionHeader navigation={navigation} />
+      <TouchableOpacity 
+        style={styles.fab}
+        onPress={NavigateToPostQuestion}
+      >
+        <Ionicons name="md-create" size={25} color="white" />
+      </TouchableOpacity>
     </SafeAreaProvider>
   )
 }

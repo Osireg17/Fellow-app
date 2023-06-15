@@ -7,6 +7,7 @@ import { getAuth } from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { set } from 'react-native-reanimated';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const Comments = ({postId, postType}) => {
   const navigation = useNavigation();
@@ -104,6 +105,7 @@ const Comments = ({postId, postType}) => {
 
   return (
     <SafeAreaProvider>
+      <ScrollView>
       <View>
         <View style={styles.commentInputContainer}>
           <TextInput
@@ -141,6 +143,7 @@ const Comments = ({postId, postType}) => {
           </View>
         ))}
       </View>
+      </ScrollView>
     </SafeAreaProvider>
   )
   

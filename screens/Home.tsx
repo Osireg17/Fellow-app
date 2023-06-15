@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -10,6 +10,7 @@ import {
   SafeAreaView, 
   ScrollView,
   TextInput,
+  RefreshControl
 } from 'react-native';
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -20,7 +21,6 @@ import { doc, getDoc, collection, getDocs, onSnapshot, query, updateDoc, arrayUn
 import { getAuth } from "firebase/auth";
 import styles from "../styles/Home.style"
 import DropDownPicker from 'react-native-dropdown-picker';
-
 
 
 async function fetchProfilePicture(uid) {
@@ -52,23 +52,40 @@ async function fetchProfilePicture(uid) {
 //   return posts;
 // }
 
-function getAllPublicPosts(setPublicPosts) {
+function getAllPublicPosts(setPublicPosts, value) {
   const q = query(
     collection(database, "public"),
     orderBy("createdAt", "desc"));
 
   return onSnapshot(q, (querySnapshot) => {
-    const posts = [];
+    let posts = [];
     querySnapshot.forEach((doc) => {
       posts.push({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt });
     });
 
+    posts = sortPosts(posts, value); // Sort the posts
     setPublicPosts(posts); // Update the state with the fetched posts
   });
 }
 
+// async function getAllPublicPosts(setPublicPosts, value) {
+//   const q = query(
+//     collection(database, "public"),
+//     orderBy("createdAt", "desc"));
 
-function getAllPrivatePosts(setPrivatePosts) {
+//   const querySnapshot = await getDocs(q);
+//   let posts = [];
+//   querySnapshot.forEach((doc) => {
+//     posts.push({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt });
+//   });
+
+//   posts = sortPosts(posts, value); // Sort the posts
+//   setPublicPosts(posts); // Update the state with the fetched posts
+// }
+
+
+
+function getAllPrivatePosts(setPrivatePosts, value) {
   const auth = getAuth();
   const currentUserUid = auth.currentUser.uid;
 
@@ -89,17 +106,34 @@ function getAllPrivatePosts(setPrivatePosts) {
 
       // Use onSnapshot to listen to changes in the privatePosts collection
       onSnapshot(q, (querySnapshot) => {
-        const posts = [];
+        let posts = [];
         querySnapshot.forEach((doc) => {
           posts.push({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt });
         });
         
+        posts = sortPosts(posts, value); // Sort the posts
         setPrivatePosts(posts);
       });
     } else {
       console.log(`No document exists for user with uid: ${currentUserUid}`);
     }
   });
+}
+
+function sortPosts(posts, value) {
+  // Define a function that sorts posts based on the value of the dropdown
+  switch (value) {
+    case 'trending':
+      // Sort posts in descending order by likes
+      return posts.sort((a, b) => b.praises.length - a.praises.length);
+    case 'latest':
+      // Sort posts in descending order by creation time
+      return posts.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+    case 'home':
+    default:
+      // Return posts as they are
+      return posts;
+  }
 }
 
 
@@ -111,12 +145,14 @@ const PostStats = ({ post, uid, onPraiseUpdate, onCommentClick, postType }) => {
     if (!liked) {
       await updateDoc(doc(database, postType, post.postId), {
         praises: arrayUnion(uid),
+        praisesCount: post.praises.length + 1,
       });
       setPraises([...post.praises, uid]);
       setLiked(true);
     } else {
       await updateDoc(doc(database, postType, post.postId), {
         praises: arrayRemove(uid),
+        praisesCount: post.praises.length - 1
       });
       setPraises(post.praises.filter(praise => praise !== uid));
       setLiked(false);
@@ -184,6 +220,11 @@ export default function MainFeed({navigation}) {
   const [publicPosts, setPublicPosts] = useState([]);
   const [privatePosts, setPrivatePosts] = useState([]);
 
+  const [publicRefreshing, setPublicRefreshing] = useState(false);
+  const [privateRefreshing, setPrivateRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+
   const auth = getAuth();
   const uid = auth.currentUser.uid;
 
@@ -208,21 +249,20 @@ export default function MainFeed({navigation}) {
     setSearchBarVisible(true);
   };
 
-  
   useEffect(() => {
-    const unsubscribe = getAllPublicPosts(setPublicPosts);
+    const unsubscribe = getAllPublicPosts(setPublicPosts, value);
     return unsubscribe; // to unsubscribe from real-time updates when the component unmounts
-  }, []);
+  }, [value]);
+
+
 
   useEffect(() => {
-    const unsubscribe = getAllPrivatePosts(setPrivatePosts);
+    const unsubscribe = getAllPrivatePosts(setPrivatePosts, value);
     return unsubscribe; // to unsubscribe from real-time updates when the component unmounts
-  }, []);
+  }, [value]);
   
 
   const [selectedValue, setSelectedValue] = useState("home");
-
-  const layout = useWindowDimensions();
 
 
   
@@ -387,28 +427,12 @@ export default function MainFeed({navigation}) {
           }
           rightComponent={
             <View style={styles.rightComponent}>
-              {searchBarVisible ? (
-                <TextInput
-                  style={styles.searchBar}
-                  onChangeText={text => setSearchText(text)}
-                  value={searchText}
-                  placeholder="Search"
-                  autoFocus={true}
-                  onBlur={() => setSearchBarVisible(false)}
-                />
-              ) : (
-                <>
-                  <TouchableOpacity onPress={handleSearchIconPress}>
-                    <FontAwesome name="search" size={24} color="black" />
-                  </TouchableOpacity>
                   <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
                     <Image
                       source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
                       style={styles.profileImage}
                     />
                   </TouchableOpacity>
-                </>
-              )}
             </View>
           }
         />
@@ -416,6 +440,7 @@ export default function MainFeed({navigation}) {
           navigationState={{ index, routes }}
           onIndexChange={setIndex}
           renderScene={renderScene}
+          animationEnabled={true}
           renderTabBar={(props) => (
             <TabBar
               {...props}

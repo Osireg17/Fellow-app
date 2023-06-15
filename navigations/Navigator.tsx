@@ -20,11 +20,12 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList  } from 
 import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, FontAwesome } from '@expo/vector-icons';
 import OtherUserProfilePage from '../screens/Profile/OtherUserProfilePage'
 import CommentsPage from '../screens/CommentsPage'
+import QuestionPost from '../components/QuestionPost'
 
 
 import { auth } from '../config/firebase'
 import ForgotPassword from '../screens/Authentication/ForgotPassword'
-import BiblePost from '../screens/Bible/BiblePost'
+import BiblePost from '../components/BiblePost'
 
 const AuthenticatedUserContext = createContext({});
 
@@ -37,6 +38,15 @@ function BibleStackNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="BiblePage" component={BiblePage} />
       <Stack.Screen name="BiblePost" component={BiblePost} />
+    </Stack.Navigator>
+  );
+}
+
+function QuestionStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Question" component={Questions} />
+      <Stack.Screen name="QuestionPost" component={QuestionPost} />
     </Stack.Navigator>
   );
 }
@@ -116,7 +126,7 @@ function Feeds() {
       />
       <Tab.Screen
         name="Questions"
-        component={Questions}
+        component={QuestionStackNavigator}
         options={{
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="comment-question-outline" size={20} color={color} />

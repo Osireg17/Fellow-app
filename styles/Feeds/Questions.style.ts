@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
   centerComponent: {
     color: 'black',
     fontSize: 24,
-    paddingRight: 25,
     paddingTop: 5
   },
   rightComponent: {
@@ -49,6 +48,18 @@ const styles = StyleSheet.create({
     marginLeft: -20,
     marginTop: 5,
   },
+  fab: {
+    position: 'absolute', 
+    width: 56, 
+    height: 56, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    right: 20, 
+    bottom: 120, 
+    backgroundColor: '#282C35', 
+    borderRadius: 30, 
+    elevation: 8
+  }
 });
 
 export default styles;
