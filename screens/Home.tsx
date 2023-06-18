@@ -1,21 +1,18 @@
-import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useEffect,} from 'react';
 import {
-  StyleSheet,
   View,
   TouchableOpacity,
   Image,
   Text,
-  useWindowDimensions,
-  KeyboardAvoidingView,
   SafeAreaView, 
   ScrollView,
-  TextInput,
-  RefreshControl
+  FlatList
+
 } from 'react-native';
 import { Header as HeaderRNE } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { FontAwesome, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { TabView, TabBar } from 'react-native-tab-view';
 import { database } from '../config/firebase';
 import { doc, getDoc, collection, getDocs, onSnapshot, query, updateDoc, arrayUnion, arrayRemove, where, orderBy} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -40,17 +37,6 @@ async function fetchProfilePicture(uid) {
   }
 }
 
-// I want a function that will return all of the posts from every user in the database regardless of whether or not the user is following them
-// async function getAllPublicPosts() {
-//   const posts = [];
-  
-//   const querySnapshot = await getDocs(collection(database, "publicPosts"));
-//   querySnapshot.forEach((doc) => {
-//     posts.push(doc.data());
-//   });
-
-//   return posts;
-// }
 
 function getAllPublicPosts(setPublicPosts, value) {
   const q = query(
@@ -67,23 +53,6 @@ function getAllPublicPosts(setPublicPosts, value) {
     setPublicPosts(posts); // Update the state with the fetched posts
   });
 }
-
-// async function getAllPublicPosts(setPublicPosts, value) {
-//   const q = query(
-//     collection(database, "public"),
-//     orderBy("createdAt", "desc"));
-
-//   const querySnapshot = await getDocs(q);
-//   let posts = [];
-//   querySnapshot.forEach((doc) => {
-//     posts.push({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt });
-//   });
-
-//   posts = sortPosts(posts, value); // Sort the posts
-//   setPublicPosts(posts); // Update the state with the fetched posts
-// }
-
-
 
 function getAllPrivatePosts(setPrivatePosts, value) {
   const auth = getAuth();
@@ -157,7 +126,33 @@ const PostStats = ({ post, uid, onPraiseUpdate, onCommentClick, postType }) => {
       setPraises(post.praises.filter(praise => praise !== uid));
       setLiked(false);
     }
+
+    updateTotalUserPraises(post.uid);
+
   };
+
+  const updateTotalUserPraises = async (uid) => {
+    const userDocRef = doc(database, "user", uid);
+    
+    // Get every post that has the same uid as the current user
+    const userPostsQuery = query(collection(database, "public"), where("uid", "==", uid));
+    
+    // Fetch posts
+    const querySnapshot = await getDocs(userPostsQuery);
+    
+    // Calculate total praises from all user's posts
+    let totalPraises = 0;
+    querySnapshot.forEach((doc) => {
+      totalPraises += doc.data().praisesCount;
+    });
+  
+    // Update the user document with totalPraises
+    await updateDoc(userDocRef, {
+      totalPraises: totalPraises
+    });
+  };
+  
+
 
   useEffect(() => {
     setLiked(post.praises.includes(uid));
@@ -266,30 +261,33 @@ export default function MainFeed({navigation}) {
 
 
   
-  const FirstRoute = ({publicPosts}) => (
+
+const FirstRoute = ({publicPosts}) => (
     <View style={[styles.scene, { backgroundColor: '#EDEDED' }]}>
-      <ScrollView>
-        {publicPosts.map((post, index) => {
-          const createdAt = post.createdAt ? post.createdAt.toDate().toLocaleString() : '';
+      <FlatList
+        data={publicPosts}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => {
+          const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
           return (
-            <View key={index} style={styles.postContainer}>
+            <View style={styles.postContainer}>
               <View style={styles.postHeader}>
-                <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
+                <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
                 <View style={styles.postUser}>
-                <TouchableOpacity onPress={() => {if (post.uid === uid) {navigation.navigate('Profile');} else {
-                  navigation.navigate('OtherUserProfilePage', {uid: post.uid });}}}>
-                  <Text style={styles.postUsername}>{post.username}</Text>
+                  <TouchableOpacity onPress={() => {if (item.uid === uid) {navigation.navigate('Profile');} else {
+                    navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                    <Text style={styles.postUsername}>{item.username}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => {if (post.uid === uid) {navigation.navigate('Profile');} else {
-                  navigation.navigate('OtherUserProfilePage', {uid: post.uid });}}}>
-                  <Image
-                    source={{ uri: post.userProfilePicture || 'https://via.placeholder.com/40' }}
-                    style={styles.postUserImage}
-                  />
+                  <TouchableOpacity onPress={() => {if (item.uid === uid) {navigation.navigate('Profile');} else {
+                    navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                    <Image
+                      source={{ uri: item.userProfilePicture || 'https://via.placeholder.com/40' }}
+                      style={styles.postUserImage}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
-              {post.BibleInformation.map((info, infoIndex) => {
+              {item.BibleInformation.map((info, infoIndex) => {
                 return (
                   <View key={infoIndex} style={styles.postBibleInformation}>
                     <Text style={styles.postBibleReference}>
@@ -301,26 +299,27 @@ export default function MainFeed({navigation}) {
                   </View>
                 );
               })}
-              <Text style={styles.postUserOpinion}>{post.userOpinion}</Text>
+              <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
               <Text style={styles.postTimestamp}>{createdAt}</Text>
               <PostStats
                 uid={uid}
-                post={post}
+                post={item}
                 onPraiseUpdate={(updatedPraises) => {
                   publicPosts[index].praises = updatedPraises;
                   setPublicPosts([...publicPosts]);
                 }}
                 onCommentClick={() => {
-                  navigation.navigate('CommentsPage', { postId: post.id, post: post });
+                  navigation.navigate('CommentsPage', { postId: item.id, post: item });
                 }}
                 postType={'public'}
               />
             </View>
           );
-        })}
-      </ScrollView>
+        }}
+      />
     </View>
   );
+
 
   const SecondRoute = () => (
     <View style={[styles.scene, { backgroundColor: '#EDEDED'}]}>

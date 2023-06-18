@@ -6,7 +6,31 @@ import { database } from '../config/firebase';
 import { addDoc, collection, doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import RNPickerSelect from "react-native-picker-select";
+import { Header as HeaderRNE } from 'react-native-elements';
+
 import uuid from 'react-native-uuid';
+
+function Header ({navigation}) {
+    return (
+        <HeaderRNE
+            leftComponent={
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back" size={24} color="black" />
+                </TouchableOpacity>
+            }
+            centerComponent={{ text: 'Create a Revelation', style: { color: 'black', fontSize: 24 } }}
+            containerStyle={{
+                backgroundColor: 'white',
+                justifyContent: 'space-around',
+                height: 120,
+                paddingTop: 0,
+                borderBottomWidth: 0,
+                borderBottomColor: 'lightgrey'
+            }}
+        />
+    );
+}
+
 
 function BiblePost({route, navigation}) {
     const { selectedVerses } = route.params;
@@ -74,10 +98,7 @@ function BiblePost({route, navigation}) {
                 behavior={Platform.OS === "ios" ? "padding" : "height"} 
                 style={styles.keyboardAvoidingView}
             >
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={32} style={styles.backArrow}/>
-                </TouchableOpacity>
-                <Text style={styles.title}>Create a revelation</Text>                
+                <Header navigation={navigation} />
                 {
                     selectedVerses && selectedVerses.map((verse, index) => (
                         <View key={index} style={styles.verseContainer}>

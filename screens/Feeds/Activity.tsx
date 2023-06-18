@@ -7,6 +7,12 @@ import styles from '../../styles/Feeds/Activity.styles'
 
 
 // This is the Activity screen, where there will be a header that just says "Activity" and a list of notifications
+// TODO: function to show who liked your post
+// TODO: function to show who commented on your post
+
+// TODO: function to show who liked your question
+
+// TODO: function to show who commented on your question
 
 function Header() {
   return (

@@ -1,11 +1,11 @@
-import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, SafeAreaView } from 'react-native';
+import {Text, View, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, SafeAreaView, FlatList } from 'react-native';
 import React,{useState, useEffect} from 'react'
 import styles from '../../styles/Feeds/Questions.style';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Header as HeaderRNE } from 'react-native-elements';
 import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { database } from '../../config/firebase';
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDocs, collection, onSnapshot, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
 
@@ -26,13 +26,7 @@ async function fetchProfilePicture(uid) {
   }
 }
 
-
-
-
 function QuestionHeader({ navigation }) {
-
-  const [searchBarVisible, setSearchBarVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
 
   const auth = getAuth();
@@ -45,11 +39,6 @@ function QuestionHeader({ navigation }) {
 
     });
   }, [uid]);
-
-  const handleSearchIconPress = () => {
-    setSearchBarVisible(!searchBarVisible);
-  };
-  
   
   const NavigateToProfile = () => {
     //complete the function to navigate to the profile page
@@ -69,9 +58,6 @@ function QuestionHeader({ navigation }) {
   }}
   rightComponent={
     <View style={styles.rightComponent}>
-          {/* <TouchableOpacity style={styles.optionsButton}>
-            <Ionicons name="ios-options-outline" size={24} color="black" />
-          </TouchableOpacity> */}
           <TouchableOpacity style={styles.profileImageContainer} onPress={NavigateToProfile}>
             <Image
               source={{ uri: profilePicture || 'https://via.placeholder.com/40' }}
@@ -87,21 +73,78 @@ function QuestionHeader({ navigation }) {
 }
 
 export default function Questions({navigation}) {
+  const [questions, setQuestions] = useState([]);
 
-  
-  const NavigateToProfile = () => {
-    //complete the function to navigate to the profile page
-    navigation.navigate('Profile');
-  }
+  const auth = getAuth();
+  const uid = auth.currentUser.uid;
+
+  useEffect(() => {
+    const questionsCollection = collection(database, "questions");
+
+    const unsubscribe = onSnapshot(questionsCollection, (querySnapshot) => {
+      const fetchedQuestions = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setQuestions(fetchedQuestions);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const NavigateToPostQuestion = () => {
-    // replace 'PostQuestion' with the route name of your question post page
     navigation.navigate('QuestionPost');
   }
 
   return (
     <SafeAreaProvider>
       <QuestionHeader navigation={navigation} />
+      <View style={[styles.scene, { backgroundColor: '#EDEDED' }]}>
+  <FlatList
+    data={questions}
+    keyExtractor={(item, index) => index.toString()}
+    renderItem={({ item, index }) => {
+      const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
+      return (
+        <View style={styles.postContainer}>
+          <View style={styles.postHeader}>
+            <Text style={styles.postTitle}>{item.title}</Text>
+            <View style={styles.postUser}>
+              <TouchableOpacity onPress={() => {if (item.uid === uid) {navigation.navigate('Profile');} else {
+                navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                <Text style={styles.postUsername}>{item.username}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {if (item.uid === uid) {navigation.navigate('Profile');} else {
+                navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                <Image
+                  source={{ uri: item.userProfilePicture || 'https://via.placeholder.com/40' }}
+                  style={styles.postUserImage}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <Text style={styles.postUserOpinion}>{item.question}</Text>
+          <View style={styles.postFooter}>
+            <Text style={styles.postTimestamp}>{createdAt}</Text>
+            <View style={styles.postFooterIcons}>
+              <TouchableOpacity style={styles.postFooterIcon}>
+                <FontAwesome name="comment-o" size={24} color="black" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postFooterIcon}>
+                <Feather name="share" size={24} color="black" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postFooterIcon}>
+                <MaterialCommunityIcons name="heart-outline" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      );
+    }}
+  />
+</View>
       <TouchableOpacity 
         style={styles.fab}
         onPress={NavigateToPostQuestion}

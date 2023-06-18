@@ -5,7 +5,7 @@ import { Header as HeaderRNE,  Avatar } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { database } from '../../config/firebase';
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, collection, where, query } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import * as Clipboard from 'expo-clipboard';
 import { DrawerActions } from '@react-navigation/native';
@@ -59,7 +59,7 @@ function UserProfile() {
       if (userDocSnap.exists()) {
         setUsername(userDocSnap.data().username);
         setConnections(userDocSnap.data().connections);
-        setPraises(userDocSnap.data().praises);
+        setPraises(userDocSnap.data().totalPraises);
         setFavoriteVerse(userDocSnap.data().favouriteVerse);
         setChurch(userDocSnap.data().church);
         setProfilePic(userDocSnap.data().profilePicture);
@@ -81,6 +81,9 @@ function UserProfile() {
     alert('Copied to Clipboard!');
   };
 
+  // write a function that will get all the praisesCount from every post with the same userID, and add them up and display it
+
+
   return (
     <View style={styles.container}>
       <Avatar
@@ -99,7 +102,7 @@ function UserProfile() {
           <Text style={styles.statLabel}>Connections</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{praises}</Text>
+          <Text style={styles.statValue}>{praises ? praises : 0}</Text>
           <Text style={styles.statLabel}>Praises</Text>
         </View>
       </View>

@@ -52,8 +52,8 @@ function OtherUserProfilePage({navigation, route}) {
       if (userDocSnap.exists()) {
         setUsername(userDocSnap.data().username);
         setConnections(userDocSnap.data().connections);
-        setPraises(userDocSnap.data().praises);
-        setFavoriteVerse(userDocSnap.data().favoriteVerse);
+        setPraises(userDocSnap.data().totalPraises);
+        setFavoriteVerse(userDocSnap.data().favouriteVerse);
         setChurch(userDocSnap.data().church);
         setProfilePic(userDocSnap.data().profilePicture);
   
@@ -93,13 +93,13 @@ function OtherUserProfilePage({navigation, route}) {
           <Text style={styles.statLabel}>Connections</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{praises.length}</Text>
+          <Text style={styles.statValue}>{praises}</Text>
           <Text style={styles.statLabel}>Praises</Text>
         </View>
       </View>
       <View style={styles.detailsContainer}>
         <View style={styles.detail}>
-          <Text style={styles.label}>Favorite Verse:</Text>
+          <Text style={styles.label}>Favourite Verse:</Text>
           <Text style={styles.value}>{favoriteVerse}</Text>
         </View>
         <View style={styles.detail}>
