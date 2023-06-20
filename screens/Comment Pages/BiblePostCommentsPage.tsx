@@ -1,12 +1,12 @@
 import {StyleSheet, Text, View, Image} from 'react-native'
 import React,{useState, createContext, useContext, useEffect} from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { database } from '../config/firebase';
+import { database } from '../../config/firebase';
 import { doc, getDoc, collection, getDocs, onSnapshot, query, updateDoc, arrayUnion, arrayRemove, where, orderBy} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigation, useRoute } from '@react-navigation/native';
 // import styles from '../styles/CommentsPage.style'
-import Comments from '../components/Comments'
+import Comments from '../../components/Comments'
 
 // this component will be used to display the post and comments on a post
 

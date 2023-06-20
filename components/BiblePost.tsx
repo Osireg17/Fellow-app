@@ -72,7 +72,6 @@ function BiblePost({route, navigation}) {
                 uid,
                 praises: [],
                 // comments as a subcollection
-                comments: [],
                 postId: uuid.v4(),
                 username,
                 userProfilePicture,

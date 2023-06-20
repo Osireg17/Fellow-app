@@ -143,6 +143,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '50%'
   },
+  iconWithCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   
 });
 

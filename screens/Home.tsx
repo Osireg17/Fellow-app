@@ -175,12 +175,11 @@ const PostStats = ({ post, uid, onPraiseUpdate, onCommentClick, postType }) => {
       <TouchableOpacity onPress={onCommentClick}>
         <View style={styles.iconContainer}>
           <MaterialCommunityIcons
-            name="message-badge-outline"
+            name="comment-text-outline"
             size={24}
             color="black"
             style={styles.icon}
           />
-          <Text style={styles.postStatsText}>{post.comments}</Text>
         </View>
       </TouchableOpacity>
     </View>

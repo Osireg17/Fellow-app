@@ -19,8 +19,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList  } from '@react-navigation/drawer';
 import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome5, Octicons, FontAwesome } from '@expo/vector-icons';
 import OtherUserProfilePage from '../screens/Profile/OtherUserProfilePage'
-import CommentsPage from '../screens/CommentsPage'
+import CommentsPage from '../screens/Comment Pages/BiblePostCommentsPage'
 import QuestionPost from '../components/QuestionPost'
+import QuestionCommentsPage from '../screens/Comment Pages/QuestionCommentsPage'
 
 
 import { auth } from '../config/firebase'
@@ -222,6 +223,11 @@ const MainStack = () => {
           <Stack.Screen
             name="CommentsPage"
             component={CommentsPage}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="QuestionCommentsPage"
+            component={QuestionCommentsPage}
             options={{headerShown: false}}
           />
         </>
