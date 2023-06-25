@@ -68,6 +68,7 @@ const Comments = ({postId, postType}) => {
     const auth = getAuth();
     const user = auth.currentUser;
     const uid = user.uid;
+    
   
     const commentRef = doc(database, postType, postId, "comments", comment.id);
   
@@ -146,7 +147,6 @@ const Comments = ({postId, postType}) => {
       </ScrollView>
     </SafeAreaProvider>
   )
-  
 }
 
 const styles = StyleSheet.create({

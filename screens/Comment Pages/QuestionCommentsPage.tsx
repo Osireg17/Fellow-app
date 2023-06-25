@@ -51,7 +51,9 @@ function QuestionCommentsPage({route}) {
                     </View>
                     <Text style={styles.questionText}>{question.question}</Text>
                 </View>
-                <QuestionComments />
+                <QuestionComments 
+                    postId={postId}
+                />
             </View>
         </SafeAreaProvider>
     )
