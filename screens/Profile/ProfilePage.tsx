@@ -5,10 +5,11 @@ import { Header as HeaderRNE,  Avatar } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { database } from '../../config/firebase';
-import { doc, onSnapshot, collection, where, query } from "firebase/firestore";
+import { doc, onSnapshot, collection, where, query, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import * as Clipboard from 'expo-clipboard';
 import { DrawerActions } from '@react-navigation/native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 function ProfileHeader({ navigation }) {
@@ -93,7 +94,10 @@ function UserProfile() {
         containerStyle={styles.avatar}
       />
       <TouchableOpacity onPress={copyToClipboard}>
-        <Text style={styles.username}>{username}</Text>
+        <Text style={styles.username}>{
+          // add an @ in front of the username
+          '@' + username
+        }</Text>
       </TouchableOpacity>
       <View style={styles.statsContainer}>
         <View style={styles.stat}>
@@ -121,12 +125,53 @@ function UserProfile() {
 }
 
 export default function ProfilePage({navigation}) {
+  const [posts, setPosts] = useState([]); // [postID, postID, postID
   const auth = getAuth();
   const userId = auth.currentUser.uid;
+
+  useEffect(() => {
+    const auth = getAuth();
+    const userId = auth.currentUser.uid;
+
+    const fetchPosts = async () => {
+      const publicCollection = collection(database, 'public');
+      const privateCollection = collection(database, 'private');
+
+      const publicQuery = query(publicCollection, where('uid', '==', userId));
+      const privateQuery = query(privateCollection, where('uid', '==', userId));
+
+      const publicDocs = await getDocs(publicQuery);
+      const privateDocs = await getDocs(privateQuery);
+
+      let allPosts = [];
+
+      publicDocs.forEach(doc => {
+          allPosts.push({ ...doc.data(), id: doc.id });
+      });
+
+      privateDocs.forEach(doc => {
+          allPosts.push({ ...doc.data(), id: doc.id });
+      });
+
+      setPosts(allPosts);
+    };
+
+    fetchPosts();
+
+  }, []);
+
   return (
     <SafeAreaProvider>
       <ProfileHeader navigation={navigation} />
       <UserProfile/>
+      {/* In a scrollView display all the posts created by the user */}
+      <ScrollView>
+        {posts.map((post) => (
+          <View key={post.id} style={styles.postContainer}>
+            <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </SafeAreaProvider>
   )
 }

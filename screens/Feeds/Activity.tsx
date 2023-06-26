@@ -1,4 +1,4 @@
-import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, SafeAreaView } from 'react-native';
+import {Text, View, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, SafeAreaView, ScrollView } from 'react-native';
 import React,{useState, useEffect} from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Header as HeaderRNE } from 'react-native-elements';
@@ -7,6 +7,8 @@ import styles from '../../styles/Feeds/Activity.styles'
 import { getAuth } from 'firebase/auth';
 import { database } from '../../config/firebase';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+
+
 
 // This is the Activity screen, where there will be a header that just says "Activity" and a list of notifications
 // TODO: function to show who liked your post
@@ -46,9 +48,14 @@ const Activity = () => {
     const q = query(publicCollection, where('uid', '==', uid));
     const querySnapshot = await getDocs(q);
 
+    const privateCollection = collection(database, 'private');
+    const q2 = query(privateCollection, where('uid', '==', uid));
+    const querySnapshot2 = await getDocs(q2);
+
+
     let activities = [];
 
-    for (const postDoc of querySnapshot.docs) {
+    for (const postDoc of querySnapshot.docs || querySnapshot2.docs) {
       let postData = postDoc.data();
 
       // Step 2: Get the likes array from each post
@@ -66,6 +73,7 @@ const Activity = () => {
               type: 'post',
               username: likerData.username,
               userOpinionTitle: postData.userOpinionTitle,
+              profilePic: likerData.profilePicture,
             });
           }
         }
@@ -88,14 +96,21 @@ const Activity = () => {
 
   return (
     <SafeAreaProvider>
-      <Header />
-      {activity.map((item, index) => (
-        <View key={index} style={styles.item}>
-          <Text style={styles.text}>{item.username} liked your post with the title {item.userOpinionTitle}</Text>
-        </View>
-      ))}
+        <Header />
+        <ScrollView>
+            {activity.map((item, index) => (
+                <View key={index} style={styles.item}>
+                    <Image source={{uri: item.profilePic || 'https://via.placeholder.com/30' }} style={styles.profilePic} />
+                    <View>
+                        <Text style={styles.username}>{item.username}</Text>
+                        <Text style={styles.action}>liked your post</Text>
+                        <Text style={styles.postTitle}>"{item.userOpinionTitle}"</Text>
+                    </View>
+                </View>
+            ))}
+        </ScrollView>
     </SafeAreaProvider>
-  );
+);
 }
 
 export default Activity

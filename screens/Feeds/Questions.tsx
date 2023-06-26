@@ -48,11 +48,6 @@ function QuestionHeader({ navigation }) {
   return (
     <>
     <HeaderRNE
-  leftComponent={
-    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.leftComponent}>
-      <Ionicons name="arrow-back" size={24} color="black" />
-    </TouchableOpacity>
-  }
   centerComponent={{
     text: 'Questions',
     style: styles.centerComponent,
