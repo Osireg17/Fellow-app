@@ -1,4 +1,4 @@
-import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable} from 'react-native';
+import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, FlatList} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import styles from '../../styles/Profile/profilePage.style'
 import { Header as HeaderRNE,  Avatar } from 'react-native-elements';
@@ -159,19 +159,54 @@ export default function ProfilePage({navigation}) {
     fetchPosts();
 
   }, []);
-
+  
   return (
     <SafeAreaProvider>
       <ProfileHeader navigation={navigation} />
-      <UserProfile/>
-      {/* In a scrollView display all the posts created by the user */}
-      <ScrollView>
-        {posts.map((post) => (
-          <View key={post.id} style={styles.postContainer}>
-            <Text style={styles.postTitle}>{post.userOpinionTitle}</Text>
-          </View>
-        ))}
-      </ScrollView>
+      <View style={[styles.scene, { backgroundColor: '#EDEDED', flex: 1 }]}>
+        <FlatList
+          data={posts}
+          keyExtractor={(item, index) => index.toString()}
+          ListHeaderComponent={<UserProfile/>}
+          renderItem={({ item, index }) => {
+            const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
+            return (
+              <View style={styles.postContainer}>
+                <View style={styles.postHeader}>
+                  <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
+                  <View style={styles.postUser}>
+                    <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
+                      navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                      <Text style={styles.postUsername}>{item.username}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
+                      navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                      <Image
+                        source={{ uri: item.userProfilePicture || 'https://via.placeholder.com/40' }}
+                        style={styles.postUserImage}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                {item.BibleInformation.map((info, infoIndex) => {
+                  return (
+                    <View key={infoIndex} style={styles.postBibleInformation}>
+                      <Text style={styles.postBibleReference}>
+                        {info.BibleBook} {info.BibleChapter}:{info.BibleVerse}
+                      </Text>
+                      <Text style={styles.postBibleText}>
+                        "{info.BibleText}"
+                      </Text>
+                    </View>
+                  );
+                })}
+                <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
+                <Text style={styles.postTimestamp}>{createdAt}</Text>
+              </View>
+            );
+          }}
+        />
+      </View>
     </SafeAreaProvider>
   )
 }
