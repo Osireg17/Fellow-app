@@ -1,15 +1,18 @@
-import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, FlatList} from 'react-native';
+import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, FlatList, Dimensions} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import styles from '../../styles/Profile/profilePage.style'
 import { Header as HeaderRNE,  Avatar } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { database } from '../../config/firebase';
 import { doc, onSnapshot, collection, where, query, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import * as Clipboard from 'expo-clipboard';
 import { DrawerActions } from '@react-navigation/native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+
 
 
 function ProfileHeader({ navigation }) {
@@ -36,6 +39,7 @@ function ProfileHeader({ navigation }) {
       containerStyle={{
         backgroundColor: 'white',
         justifyContent: 'space-around',
+        height: 100,
       }}
     />
   );
@@ -84,24 +88,20 @@ function UserProfile() {
 
   // write a function that will get all the praisesCount from every post with the same userID, and add them up and display it
 
-
   return (
-    <View style={styles.container}>
+  <View style={styles.profileContainer}>
+    <Text style={styles.username}>
+      {username}
+    </Text>
+    <View style={styles.headerContainer}>
       <Avatar
         rounded
-        size={120}
+        size={80}
         source={{ uri: profilePic || 'https://via.placeholder.com/200' }}
         containerStyle={styles.avatar}
       />
-      <TouchableOpacity onPress={copyToClipboard}>
-        <Text style={styles.username}>{
-          // add an @ in front of the username
-          '@' + username
-        }</Text>
-      </TouchableOpacity>
       <View style={styles.statsContainer}>
         <View style={styles.stat}>
-          {/* connection in the firebase database is an array of userID. Display the length of the array */}
           <Text style={styles.statValue}>{connections.length}</Text>
           <Text style={styles.statLabel}>Connections</Text>
         </View>
@@ -110,103 +110,284 @@ function UserProfile() {
           <Text style={styles.statLabel}>Praises</Text>
         </View>
       </View>
-      <View style={styles.detailsContainer}>
-        <View style={styles.detail}>
-          <Text style={styles.label}>Favorite Verse:</Text>
-          <Text style={styles.value}>{favoriteVerse}</Text>
-        </View>
-        <View style={styles.detail}>
-          <Text style={styles.label}>Church:</Text>
-          <Text style={styles.value}>{church}</Text>
-        </View>
+    </View>
+    <View style={styles.detailsContainer}>
+      <View style={styles.detail}>
+        <Text style={styles.label}>Favorite Verse:</Text>
+        <Text style={styles.value}>{favoriteVerse}</Text>
+        <Text style={styles.label}>Church:</Text>
+        <Text style={styles.value}>{church}</Text>
       </View>
     </View>
-  );
+  </View>
+);
+
 }
 
-export default function ProfilePage({navigation}) {
-  const [posts, setPosts] = useState([]); // [postID, postID, postID
+const PublicPostsRoute = ({navigation}) => {
+  const [publicPosts, setPublicPosts] = useState([]);
   const auth = getAuth();
   const userId = auth.currentUser.uid;
 
   useEffect(() => {
-    const auth = getAuth();
-    const userId = auth.currentUser.uid;
-
     const fetchPosts = async () => {
       const publicCollection = collection(database, 'public');
-      const privateCollection = collection(database, 'private');
-
       const publicQuery = query(publicCollection, where('uid', '==', userId));
-      const privateQuery = query(privateCollection, where('uid', '==', userId));
-
       const publicDocs = await getDocs(publicQuery);
-      const privateDocs = await getDocs(privateQuery);
 
-      let allPosts = [];
-
+      let allPublicPosts = [];
       publicDocs.forEach(doc => {
-          allPosts.push({ ...doc.data(), id: doc.id });
+        allPublicPosts.push({ ...doc.data(), id: doc.id });
       });
 
-      privateDocs.forEach(doc => {
-          allPosts.push({ ...doc.data(), id: doc.id });
-      });
-
-      setPosts(allPosts);
+      setPublicPosts(allPublicPosts);
     };
 
     fetchPosts();
-
   }, []);
+
+  return (
+    <FlatList
+      data={publicPosts}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item, index }) => {
+        const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
+        return (
+          <View style={styles.postContainer}>
+            <View style={styles.postHeader}>
+              <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
+              <View style={styles.postUser}>
+                <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                  <Text style={styles.postUsername}>{item.username}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                  <Image
+                    source={{ uri: item.userProfilePicture || 'https://via.placeholder.com/40' }}
+                    style={styles.postUserImage}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+            {item.BibleInformation.map((info, infoIndex) => {
+              return (
+                <View key={infoIndex} style={styles.postBibleInformation}>
+                  <Text style={styles.postBibleReference}>
+                    {info.BibleBook} {info.BibleChapter}:{info.BibleVerse}
+                  </Text>
+                  <Text style={styles.postBibleText}>
+                    "{info.BibleText}"
+                  </Text>
+                </View>
+              );
+            })}
+            <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
+            <Text style={styles.postTimestamp}>{createdAt}</Text>
+            <View style={styles.postFooter}>
+              <View style={styles.praiseContainer}>
+                <AntDesign name="heart" size={24} color="red" />
+                <Text style={styles.praiseCount}>{item.praises ? item.praises.length : 0}</Text>
+              </View>
+              <TouchableOpacity style={styles.commentButton} onPress={() => navigation.navigate('CommentsPage', { postId: item.id })}>
+                <AntDesign name="message1" size={24} color="black" />
+                <Text style={styles.commentCount}>{item.comments ? item.comments.length : 0}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      }}
+    />
+  );
+};
+
+const PrivatePostsRoute = ({navigation}) => {
+  const [privatePosts, setPrivatePosts] = useState([]);
+  const auth = getAuth();
+  const userId = auth.currentUser.uid;
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const publicCollection = collection(database, 'private');
+      const publicQuery = query(publicCollection, where('uid', '==', userId));
+      const publicDocs = await getDocs(publicQuery);
+
+      let allPublicPosts = [];
+      publicDocs.forEach(doc => {
+        allPublicPosts.push({ ...doc.data(), id: doc.id });
+      });
+
+      setPrivatePosts(allPublicPosts);
+    };
+
+    fetchPosts();
+  }, []);
+
+  return (
+    <FlatList
+      data={privatePosts}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item, index }) => {
+        const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
+        return (
+          <View style={styles.postContainer}>
+            <View style={styles.postHeader}>
+              <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
+              <View style={styles.postUser}>
+                <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                  <Text style={styles.postUsername}>{item.username}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                  <Image
+                    source={{ uri: item.userProfilePicture || 'https://via.placeholder.com/40' }}
+                    style={styles.postUserImage}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+            {item.BibleInformation.map((info, infoIndex) => {
+              return (
+                <View key={infoIndex} style={styles.postBibleInformation}>
+                  <Text style={styles.postBibleReference}>
+                    {info.BibleBook} {info.BibleChapter}:{info.BibleVerse}
+                  </Text>
+                  <Text style={styles.postBibleText}>
+                    "{info.BibleText}"
+                  </Text>
+                </View>
+              );
+            })}
+            <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
+            <Text style={styles.postTimestamp}>{createdAt}</Text>
+            <View style={styles.postFooter}>
+              <View style={styles.praiseContainer}>
+                <AntDesign name="heart" size={24} color="red" />
+                <Text style={styles.praiseCount}>{item.praises ? item.praises.length : 0}</Text>
+              </View>
+              <TouchableOpacity style={styles.commentButton} onPress={() => navigation.navigate('CommentsPage', { postId: item.id })}>
+                <AntDesign name="message1" size={24} color="black" />
+                <Text style={styles.commentCount}>{item.comments ? item.comments.length : 0}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      }}
+    />
+  );
+};
+
+const QuestionsRoute = ({navigation}) => {
+  const [questionsPost, setQuestionsPost] = useState([]);
+  const auth = getAuth();
+  const userId = auth.currentUser.uid;
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const publicCollection = collection(database, 'questions');
+      const publicQuery = query(publicCollection, where('uid', '==', userId));
+      const publicDocs = await getDocs(publicQuery);
+
+      let allPublicPosts = [];
+      publicDocs.forEach(doc => {
+        allPublicPosts.push({ ...doc.data(), id: doc.id });
+      });
+
+      setQuestionsPost(allPublicPosts);
+    };
+
+    fetchPosts();
+  }, []);
+
+  return (
+    <FlatList
+      data={questionsPost}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item, index }) => {
+        const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
+        return (
+          <View style={styles.postContainer}>
+            <View style={styles.postHeader}>
+              <Text style={styles.postTitle}>{item.title}</Text>
+              <View style={styles.postUser}>
+                <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                  <Text style={styles.postUsername}>{item.username}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
+                  navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
+                  <Image
+                    source={{ uri: item.userProfilePicture || 'https://via.placeholder.com/40' }}
+                    style={styles.postUserImage}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <Text style={styles.postUserQuestion}>{item.question}</Text>
+            <Text style={styles.postTimestamp}>{createdAt}</Text>
+            <View style={styles.postFooter}>
+              <View style={styles.praiseContainer}>
+                <AntDesign name="heart" size={24} color="red" />
+                <Text style={styles.praiseCount}>{item.praises ? item.praises.length : 0}</Text>
+              </View>
+              <TouchableOpacity style={styles.commentButton} onPress={() => navigation.navigate('CommentsPage', { postId: item.id })}>
+                <AntDesign name="message1" size={24} color="black" />
+                <Text style={styles.commentCount}>{item.comments ? item.comments.length : 0}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      }
+      }
+    />
+  );
+};
+
+export default function ProfilePage({navigation}) {
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'public', title: 'Public' },
+    { key: 'private', title: 'Private' },
+    { key: 'questions', title: 'Questions' },
+  ]);
+
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case 'public':
+        return <PublicPostsRoute navigation={navigation} />;
+      case 'private':
+        return <PrivatePostsRoute navigation={navigation} />;
+      case 'questions':
+        return <QuestionsRoute navigation={navigation} />;
+      default:
+        return null;
+    }
+  };
+  
+
   
   return (
     <SafeAreaProvider>
       <ProfileHeader navigation={navigation} />
-      <View style={[styles.scene, { backgroundColor: '#EDEDED', flex: 1 }]}>
-        <FlatList
-          data={posts}
-          keyExtractor={(item, index) => index.toString()}
-          ListHeaderComponent={<UserProfile/>}
-          renderItem={({ item, index }) => {
-            const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
-            return (
-              <View style={styles.postContainer}>
-                <View style={styles.postHeader}>
-                  <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
-                  <View style={styles.postUser}>
-                    <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
-                      navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
-                      <Text style={styles.postUsername}>{item.username}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
-                      navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
-                      <Image
-                        source={{ uri: item.userProfilePicture || 'https://via.placeholder.com/40' }}
-                        style={styles.postUserImage}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                {item.BibleInformation.map((info, infoIndex) => {
-                  return (
-                    <View key={infoIndex} style={styles.postBibleInformation}>
-                      <Text style={styles.postBibleReference}>
-                        {info.BibleBook} {info.BibleChapter}:{info.BibleVerse}
-                      </Text>
-                      <Text style={styles.postBibleText}>
-                        "{info.BibleText}"
-                      </Text>
-                    </View>
-                  );
-                })}
-                <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
-                <Text style={styles.postTimestamp}>{createdAt}</Text>
-              </View>
-            );
-          }}
+      <SafeAreaView style={{ flex: 1 }}>
+        <UserProfile />
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{ width: Dimensions.get('window').width }}
+          renderTabBar={props => (
+            <TabBar
+              {...props}
+              indicatorStyle={{ backgroundColor: 'black' }}
+              style={{ backgroundColor: 'white'}}
+              labelStyle={{ color: 'black' }}  // set color for labels
+              activeColor="black"  // set active color for labels
+            />
+          )}
         />
-      </View>
+      </SafeAreaView>
     </SafeAreaProvider>
-  )
+  );
 }

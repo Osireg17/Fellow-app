@@ -2,58 +2,60 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const styles = StyleSheet.create({
-  container: {
-    width: Dimensions.get('window').width,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ffffff',
-    padding: 10,
-  },
-  avatar: {
-    marginBottom: 15,
-  },
-  username: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 20,
-  },
-  stat: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  statLabel: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#888',
-  },
-  detailsContainer: {
-    width: '100%',
-  },
-  detail: {
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-    paddingLeft: 20,
-  },
-  value: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#666',
-    paddingLeft: 20,
-    paddingTop: 20,
-  },
+    profileContainer: {
+      flex: 1,
+      alignItems: 'flex-start',
+      padding: 20,
+      backgroundColor: '#ffffff',
+      marginTop: -60,
+    },
+    username: {
+      fontSize: 36,
+      fontWeight: 'bold',
+      marginBottom: 20,
+    },
+    headerContainer: {
+      flexDirection: 'row',
+      marginBottom: 10,
+    },
+    avatar: {
+      marginRight: 20,
+    },
+    statsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    stat: {
+      marginRight: 20,
+    },
+    statValue: {
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    statLabel: {
+      fontSize: 16,
+    },
+    detailsContainer: {
+      marginTop: 22,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+    },
+    detail: {
+      flex: 1,
+      padding: 10,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginBottom: 5,
+    },
+    value: {
+      fontSize: 16,
+      backgroundColor: '#f9f9f9',
+      padding: 5,
+      borderRadius: 10,
+    },  
   postContainer: {
     width: '100%',
     backgroundColor: '#ffffff',
@@ -113,6 +115,44 @@ const styles = StyleSheet.create({
   scene : {
     flex: 1,
   },
+  postUserQuestion: {
+    fontSize: 15,
+    color: '#333',
+    lineHeight: 20,
+    marginTop: 5,
+    backgroundColor: '#f5f8fa',
+    padding: 10,
+    borderRadius: 10,
+  },
+  postFooter: {
+    flexDirection: 'row', 
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  
+  praiseContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  
+  praiseCount: {
+    marginLeft: 5,
+    fontSize: 16,
+    color: '#000',
+  },
+  
+  commentButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  
+  commentCount: {
+    marginLeft: 5,
+    fontSize: 16,
+    color: '#000',
+  },
+  
 });
 
 export default styles;
