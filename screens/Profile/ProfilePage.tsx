@@ -1,17 +1,16 @@
-import {Text, View, TextInput, TouchableOpacity, Image, Platform, Alert, Button, KeyboardAvoidingView, Pressable, FlatList, Dimensions} from 'react-native';
+import {Text, View, TouchableOpacity, Image, FlatList, Dimensions} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import styles from '../../styles/Profile/profilePage.style'
 import { Header as HeaderRNE,  Avatar } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { FontAwesome, Feather, Ionicons, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { database } from '../../config/firebase';
 import { doc, onSnapshot, collection, where, query, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import * as Clipboard from 'expo-clipboard';
 import { DrawerActions } from '@react-navigation/native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { TabView, TabBar } from 'react-native-tab-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 
 
 
@@ -47,7 +46,8 @@ function ProfileHeader({ navigation }) {
 
 function UserProfile() {
   const [username, setUsername] = useState('');
-  const [connections, setConnections] = useState([]);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
   const [praises, setPraises] = useState([]);
   const [favoriteVerse, setFavoriteVerse] = useState('');
   const [church, setChurch] = useState('');
@@ -63,7 +63,8 @@ function UserProfile() {
     const unsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
       if (userDocSnap.exists()) {
         setUsername(userDocSnap.data().username);
-        setConnections(userDocSnap.data().connections);
+        setFollowers(userDocSnap.data().followers);
+        setFollowing(userDocSnap.data().following);
         setPraises(userDocSnap.data().totalPraises);
         setFavoriteVerse(userDocSnap.data().favouriteVerse);
         setChurch(userDocSnap.data().church);
@@ -102,12 +103,16 @@ function UserProfile() {
       />
       <View style={styles.statsContainer}>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{connections.length}</Text>
-          <Text style={styles.statLabel}>Connections</Text>
+          <Text style={styles.statLabel}>Followers</Text>
+          <Text style={styles.statValue}>{followers.length}</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{praises ? praises : 0}</Text>
+          <Text style={styles.statLabel}>Following</Text>
+          <Text style={styles.statValue}>{following.length}</Text>
+        </View>
+        <View style={styles.stat}>
           <Text style={styles.statLabel}>Praises</Text>
+          <Text style={styles.statValue}>{praises ? praises : 0}</Text>
         </View>
       </View>
     </View>

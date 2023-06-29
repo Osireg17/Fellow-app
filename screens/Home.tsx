@@ -58,36 +58,50 @@ function getAllPrivatePosts(setPrivatePosts, value) {
   const auth = getAuth();
   const currentUserUid = auth.currentUser.uid;
 
-  // First fetch the connections array from the current user's document
   const currentUserDocRef = doc(database, 'user', currentUserUid);
   
-  // Use onSnapshot to listen to changes in the user document
   onSnapshot(currentUserDocRef, (currentUserDocSnap) => {
-    if (currentUserDocSnap.exists()) {
-      // Create a copy of the connections array and add the current user's uid to it
-      const connections = [...currentUserDocSnap.data().connections, currentUserUid];
+      const data = currentUserDocSnap.data();
+      console.log("Current user data:", data);
 
-      // Then query the privatePosts collection
-      const q = query(collection(database, "private"), 
-      where("uid", "in", connections),
-      orderBy("createdAt", "desc")
+      // Check if the current user is following anyone
+      // Also include the current user's own posts
+      let uids = [];
+      if (Array.isArray(data.following)) {
+        uids = [...data.following, currentUserUid];
+      } else {
+        uids = [currentUserUid];
+      }
+
+      // Create a query to get all private posts from the users that the current user is following
+      // Also include the current user's own posts
+      const q = query(
+        collection(database, "private"),
+        where("uid", "in", uids),
+        orderBy("createdAt", "desc")
       );
 
-      // Use onSnapshot to listen to changes in the privatePosts collection
       onSnapshot(q, (querySnapshot) => {
         let posts = [];
         querySnapshot.forEach((doc) => {
-          posts.push({ ...doc.data(), id: doc.id, createdAt: doc.data().createdAt });
+          // Check if doc.data() is not null or undefined
+          if (doc.data()) {
+            const docData = doc.data();
+            const createdAt = docData.createdAt ? docData.createdAt : null; // Set createdAt to null if it doesn't exist
+
+            posts.push({ ...docData, id: doc.id, createdAt });
+          }
         });
         
         posts = sortPosts(posts, value); // Sort the posts
         setPrivatePosts(posts);
       });
-    } else {
-      console.log(`No document exists for user with uid: ${currentUserUid}`);
-    }
   });
 }
+
+
+
+
 
 function sortPosts(posts, value) {
   // Define a function that sorts posts based on the value of the dropdown
@@ -214,9 +228,6 @@ export default function MainFeed({navigation}) {
   const [publicPosts, setPublicPosts] = useState([]);
   const [privatePosts, setPrivatePosts] = useState([]);
 
-  const [publicRefreshing, setPublicRefreshing] = useState(false);
-  const [privateRefreshing, setPrivateRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
 
 
   const auth = getAuth();
@@ -381,7 +392,8 @@ const FirstRoute = ({publicPosts}) => (
       case 'first':
         return <FirstRoute publicPosts={publicPosts} />;
       case 'second':
-        return <SecondRoute />;
+        return <SecondRoute privatePosts={privatePosts}
+        />;
       default:
         return null;
     }
