@@ -1,16 +1,17 @@
-import {Text, View, TouchableOpacity, Image, FlatList, Dimensions} from 'react-native';
+import {Text, View, TouchableOpacity, Image, FlatList, Dimensions, Alert} from 'react-native';
 import React, {useState, useEffect} from 'react'
 import styles from '../../styles/Profile/profilePage.style'
 import { Header as HeaderRNE,  Avatar } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { database } from '../../config/firebase';
-import { doc, onSnapshot, collection, where, query, getDocs } from "firebase/firestore";
+import { doc, onSnapshot, collection, where, query, getDocs, deleteDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import * as Clipboard from 'expo-clipboard';
 import { DrawerActions } from '@react-navigation/native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 
 
 
@@ -151,6 +152,14 @@ const PublicPostsRoute = ({navigation}) => {
     fetchPosts();
   }, []);
 
+  // function to delete a post
+  const deletePost = async (id) => {
+    const publicDocRef = doc(database, 'public', id);
+    await deleteDoc(publicDocRef);
+  };
+
+
+
   return (
     <FlatList
       data={publicPosts}
@@ -159,6 +168,35 @@ const PublicPostsRoute = ({navigation}) => {
         const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
         return (
           <View style={styles.postContainer}>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Menu>
+                <MenuTrigger>
+                  <MaterialCommunityIcons name="dots-horizontal" size={24} color="black" />
+                </MenuTrigger>
+                <MenuOptions>
+                  <MenuOption onSelect={() => {navigation.navigate('EditPostPage', {id: item.id, postType: 'public'});}}>
+                    <Text style={{color: 'black'}}>Edit</Text>
+                  </MenuOption>
+                  <MenuOption onSelect={() => {
+                    Alert.alert(
+                      'Delete Post',
+                      'Are you sure you want to delete this post?',
+                      [
+                        {
+                          text: 'Cancel',
+                          onPress: () => console.log('Cancel Pressed'),
+                          style: 'cancel'
+                        },
+                        { text: 'OK', onPress: () => deletePost(item.id) }
+                      ],
+                      { cancelable: false }
+                    );
+                  }}>
+                    <Text style={{color: 'black'}}>Delete</Text>
+                  </MenuOption>
+                </MenuOptions>
+              </Menu>
+            </View>
             <View style={styles.postHeader}>
               <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
               <View style={styles.postUser}>
@@ -228,6 +266,12 @@ const PrivatePostsRoute = ({navigation}) => {
     fetchPosts();
   }, []);
 
+  // function to delete a post
+  const deletePost = async (id) => {
+    const publicDocRef = doc(database, 'private', id);
+    await deleteDoc(publicDocRef);
+  };
+
   return (
     <FlatList
       data={privatePosts}
@@ -236,6 +280,35 @@ const PrivatePostsRoute = ({navigation}) => {
         const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
         return (
           <View style={styles.postContainer}>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Menu>
+                <MenuTrigger>
+                  <MaterialCommunityIcons name="dots-horizontal" size={24} color="black" />
+                </MenuTrigger>
+                <MenuOptions>
+                  <MenuOption onSelect={() => {navigation.navigate('EditPostPage', {id: item.id, postType: 'private'});}}>
+                    <Text style={{color: 'black'}}>Edit</Text>
+                  </MenuOption>
+                  <MenuOption onSelect={() => {
+                    Alert.alert(
+                      'Delete Post',
+                      'Are you sure you want to delete this post?',
+                      [
+                        {
+                          text: 'Cancel',
+                          onPress: () => console.log('Cancel Pressed'),
+                          style: 'cancel'
+                        },
+                        { text: 'OK', onPress: () => deletePost(item.id) }
+                      ],
+                      { cancelable: false }
+                    );
+                  }}>
+                    <Text style={{color: 'black'}}>Delete</Text>
+                  </MenuOption>
+                </MenuOptions>
+              </Menu>
+            </View>
             <View style={styles.postHeader}>
               <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
               <View style={styles.postUser}>
@@ -305,6 +378,12 @@ const QuestionsRoute = ({navigation}) => {
     fetchPosts();
   }, []);
 
+  // function to delete a post
+  const deletePost = async (id) => {
+    const publicDocRef = doc(database, 'questions', id);
+    await deleteDoc(publicDocRef);
+  };
+
   return (
     <FlatList
       data={questionsPost}
@@ -313,6 +392,35 @@ const QuestionsRoute = ({navigation}) => {
         const createdAt = item.createdAt ? item.createdAt.toDate().toLocaleString() : '';
         return (
           <View style={styles.postContainer}>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Menu>
+                <MenuTrigger>
+                  <MaterialCommunityIcons name="dots-horizontal" size={24} color="black" />
+                </MenuTrigger>
+                <MenuOptions>
+                  <MenuOption onSelect={() => {navigation.navigate('EditPostPage', {id: item.id, postType: 'questions'});}}>
+                    <Text style={{color: 'black'}}>Edit</Text>
+                  </MenuOption>
+                  <MenuOption onSelect={() => {
+                    Alert.alert(
+                      'Delete Post',
+                      'Are you sure you want to delete this post?',
+                      [
+                        {
+                          text: 'Cancel',
+                          onPress: () => console.log('Cancel Pressed'),
+                          style: 'cancel'
+                        },
+                        { text: 'OK', onPress: () => deletePost(item.id) }
+                      ],
+                      { cancelable: false }
+                    );
+                  }}>
+                    <Text style={{color: 'black'}}>Delete</Text>
+                  </MenuOption>
+                </MenuOptions>
+              </Menu>
+            </View>
             <View style={styles.postHeader}>
               <Text style={styles.postTitle}>{item.title}</Text>
               <View style={styles.postUser}>

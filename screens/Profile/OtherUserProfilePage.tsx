@@ -8,7 +8,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import styles from '../../styles/Profile/OtherUserProfilePage.style'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import {AntDesign } from '@expo/vector-icons';
+import {AntDesign, FontAwesome5 } from '@expo/vector-icons';
 
 
 function OtherUserProfile({navigation, route}) {
@@ -298,20 +298,25 @@ const QuestionPostsRoute = ({navigation, uid}) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const questionCollection = collection(database, 'question');
+      const questionCollection = collection(database, 'questions');
       const questionQuery = query(questionCollection, where('uid', '==', otherUserUid));
       const questionDocs = await getDocs(questionQuery);
-
+  
       let allQuestionPosts = [];
       questionDocs.forEach(doc => {
-        allQuestionPosts.push({ ...doc.data(), id: doc.id });
+        const postData = doc.data();
+        // only add the post if it's not of type 'anonymous'
+        if (postData.type !== 'anonymous') {
+          allQuestionPosts.push({ ...postData, id: doc.id });
+        }
       });
-
+  
       setQuestionPosts(allQuestionPosts);
     };
-
+  
     fetchPosts();
   }, []);
+  
 
   return (
     <FlatList

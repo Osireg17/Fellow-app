@@ -22,6 +22,7 @@ import OtherUserProfilePage from '../screens/Profile/OtherUserProfilePage'
 import CommentsPage from '../screens/Comment Pages/BiblePostCommentsPage'
 import QuestionPost from '../components/QuestionPost'
 import QuestionCommentsPage from '../screens/Comment Pages/QuestionCommentsPage'
+import EditPostPage from '../components/EditPostPage'
 
 
 import { auth } from '../config/firebase'
@@ -230,6 +231,12 @@ const MainStack = () => {
             component={QuestionCommentsPage}
             options={{headerShown: false}}
           />
+          <Stack.Screen
+            name='EditPostPage'
+            component={EditPostPage}
+            options={{headerShown: false}}
+          />
+
         </>
       ) : (
         <>
