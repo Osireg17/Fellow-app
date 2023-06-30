@@ -34,12 +34,12 @@ function Header ({navigation}) {
 
 function BiblePost({route, navigation}) {
     const { selectedVerses } = route.params;
-    const [userOpinionTitle, setUserOpinionTitle] = useState("");
-    const [userOpinion, setUserOpinion] = useState("");
+    const [Title, setTitle] = useState("");
+    const [Content, setContent] = useState("");
     const [postType, setPostType] = useState("");
 
     const postOpinion = async () => {
-        if (userOpinion === "" || postType === "") {
+        if (Content === "" || postType === "") {
             alert("Please enter an opinion and select a post type.");
             return;
         }
@@ -59,8 +59,8 @@ function BiblePost({route, navigation}) {
         const userProfilePicture = userDoc.data().profilePicture;
     
             const postData = {
-                userOpinionTitle,
-                userOpinion,
+                Title,
+                Content,
                 postType,
                 BibleInformation: selectedVerses.map(verse => ({
                     BibleBook: verse.book,
@@ -108,14 +108,14 @@ function BiblePost({route, navigation}) {
                 }
                 <TextInput
                     style={styles.TitleInput}
-                    onChangeText={setUserOpinionTitle}
-                    value={userOpinionTitle}
+                    onChangeText={setTitle}
+                    value={Title}
                     placeholder="Enter a title for your opinion..."
                 />
                 <TextInput
                     style={styles.input}
-                    onChangeText={setUserOpinion}
-                    value={userOpinion}
+                    onChangeText={setContent}
+                    value={Content}
                     placeholder="Enter your opinion on the verse..."
                     multiline={true}
                 />

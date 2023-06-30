@@ -29,10 +29,10 @@ function ProfileHeader({ navigation }) {
               navigation.navigate('EditProfilePage');
             }}
           >
-            <MaterialCommunityIcons name="pencil" size={24} color="black" />
+            <MaterialCommunityIcons name="pencil" size={22} color="black" />
           </TouchableOpacity>
           <TouchableOpacity onPress={openMenu}>
-            <Feather name="menu" size={24} color="black" />
+            <Feather name="menu" size={22} color="black" />
           </TouchableOpacity>
         </View>
       }
@@ -136,21 +136,22 @@ const PublicPostsRoute = ({navigation}) => {
   const userId = auth.currentUser.uid;
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const publicCollection = collection(database, 'public');
-      const publicQuery = query(publicCollection, where('uid', '==', userId));
-      const publicDocs = await getDocs(publicQuery);
-
+    const publicCollection = collection(database, 'public');
+    const publicQuery = query(publicCollection, where('uid', '==', userId));
+  
+    const unsubscribe = onSnapshot(publicQuery, snapshot => {
       let allPublicPosts = [];
-      publicDocs.forEach(doc => {
+      snapshot.docs.forEach(doc => {
         allPublicPosts.push({ ...doc.data(), id: doc.id });
       });
-
+  
       setPublicPosts(allPublicPosts);
-    };
-
-    fetchPosts();
+    });
+  
+    // Clean up subscription on unmount
+    return () => unsubscribe();
   }, []);
+  
 
   // function to delete a post
   const deletePost = async (id) => {
@@ -198,7 +199,7 @@ const PublicPostsRoute = ({navigation}) => {
               </Menu>
             </View>
             <View style={styles.postHeader}>
-              <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
+              <Text style={styles.postTitle}>{item.Title}</Text>
               <View style={styles.postUser}>
                 <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
                   navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
@@ -225,7 +226,7 @@ const PublicPostsRoute = ({navigation}) => {
                 </View>
               );
             })}
-            <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
+            <Text style={styles.postUserOpinion}>{item.Content}</Text>
             <Text style={styles.postTimestamp}>{createdAt}</Text>
             <View style={styles.postFooter}>
               <View style={styles.praiseContainer}>
@@ -250,21 +251,22 @@ const PrivatePostsRoute = ({navigation}) => {
   const userId = auth.currentUser.uid;
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const publicCollection = collection(database, 'private');
-      const publicQuery = query(publicCollection, where('uid', '==', userId));
-      const publicDocs = await getDocs(publicQuery);
-
-      let allPublicPosts = [];
-      publicDocs.forEach(doc => {
-        allPublicPosts.push({ ...doc.data(), id: doc.id });
+    const privateCollection = collection(database, 'private');
+    const privateQuery = query(privateCollection, where('uid', '==', userId));
+  
+    const unsubscribe = onSnapshot(privateQuery, snapshot => {
+      let allPrivatePosts = [];
+      snapshot.docs.forEach(doc => {
+        allPrivatePosts.push({ ...doc.data(), id: doc.id });
       });
-
-      setPrivatePosts(allPublicPosts);
-    };
-
-    fetchPosts();
+  
+      setPrivatePosts(allPrivatePosts);
+    });
+  
+    // Clean up subscription on unmount
+    return () => unsubscribe();
   }, []);
+  
 
   // function to delete a post
   const deletePost = async (id) => {
@@ -310,7 +312,7 @@ const PrivatePostsRoute = ({navigation}) => {
               </Menu>
             </View>
             <View style={styles.postHeader}>
-              <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
+              <Text style={styles.postTitle}>{item.Title}</Text>
               <View style={styles.postUser}>
                 <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
                   navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
@@ -337,7 +339,7 @@ const PrivatePostsRoute = ({navigation}) => {
                 </View>
               );
             })}
-            <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
+            <Text style={styles.postUserOpinion}>{item.Content}</Text>
             <Text style={styles.postTimestamp}>{createdAt}</Text>
             <View style={styles.postFooter}>
               <View style={styles.praiseContainer}>
@@ -362,21 +364,22 @@ const QuestionsRoute = ({navigation}) => {
   const userId = auth.currentUser.uid;
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const publicCollection = collection(database, 'questions');
-      const publicQuery = query(publicCollection, where('uid', '==', userId));
-      const publicDocs = await getDocs(publicQuery);
-
-      let allPublicPosts = [];
-      publicDocs.forEach(doc => {
-        allPublicPosts.push({ ...doc.data(), id: doc.id });
+    const questionCollection = collection(database, 'questions');
+    const questionQuery = query(questionCollection, where('uid', '==', userId));
+  
+    const unsubscribe = onSnapshot(questionQuery, snapshot => {
+      let allQuestionPosts = [];
+      snapshot.docs.forEach(doc => {
+        allQuestionPosts.push({ ...doc.data(), id: doc.id });
       });
-
-      setQuestionsPost(allPublicPosts);
-    };
-
-    fetchPosts();
+  
+      setQuestionsPost(allQuestionPosts);
+    });
+  
+    // Clean up subscription on unmount
+    return () => unsubscribe();
   }, []);
+  
 
   // function to delete a post
   const deletePost = async (id) => {
@@ -422,7 +425,7 @@ const QuestionsRoute = ({navigation}) => {
               </Menu>
             </View>
             <View style={styles.postHeader}>
-              <Text style={styles.postTitle}>{item.title}</Text>
+              <Text style={styles.postTitle}>{item.Title}</Text>
               <View style={styles.postUser}>
                 <TouchableOpacity onPress={() => {if (item.uid === userId) {navigation.navigate('Profile');} else {
                   navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
@@ -437,7 +440,7 @@ const QuestionsRoute = ({navigation}) => {
                 </TouchableOpacity>
               </View>
             </View>
-            <Text style={styles.postUserQuestion}>{item.question}</Text>
+            <Text style={styles.postUserQuestion}>{item.Content}</Text>
             <Text style={styles.postTimestamp}>{createdAt}</Text>
             <View style={styles.postFooter}>
               <View style={styles.praiseContainer}>
@@ -494,7 +497,7 @@ export default function ProfilePage({navigation}) {
             <TabBar
               {...props}
               indicatorStyle={{ backgroundColor: 'black' }}
-              style={{ backgroundColor: 'white'}}
+              style={{ backgroundColor: 'white', marginTop: -15}}
               labelStyle={{ color: 'black' }}  // set color for labels
               activeColor="black"  // set active color for labels
             />

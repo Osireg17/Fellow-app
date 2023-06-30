@@ -31,8 +31,8 @@ function Header({navigation}) {
 }
 
 function QuestionPost({navigation}) {
-  const [title, setTitle] = useState('');
-  const [question, setQuestion] = useState('');
+  const [Title, setTitle] = useState('');
+  const [Content, setContent] = useState('');
   const [type, setType] = useState('public');
   const [loading, setLoading] = useState(false);
   
@@ -54,7 +54,7 @@ function QuestionPost({navigation}) {
 // 
 
   const postQuestion = async () => {
-    if (title === "" || question === "" || type === "") {
+    if (Title === "" || Content === "" || type === "") {
       Alert.alert('Error', 'Please enter a title and question', [{
         text: 'OK',
       }]);
@@ -75,8 +75,8 @@ function QuestionPost({navigation}) {
         const userProfilePicture = userDoc.data().profilePicture;
 
         const postData = {
-          title,
-          question,
+          Title,
+          Content,
           type,
           uid,
           username,
@@ -116,13 +116,13 @@ function QuestionPost({navigation}) {
           placeholder="Title of Question"
           style={styles.TitleInput}
           onChangeText={setTitle}
-          value={title}
+          value={Title}
         />
         <TextInput
           placeholder="Ask your question...?"
           style={styles.input}
-          onChangeText={setQuestion}
-          value={question}
+          onChangeText={setContent}
+          value={Content}
           multiline={true}
         />
         <RNPickerSelect

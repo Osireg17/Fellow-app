@@ -169,7 +169,7 @@ const PublicPostsRoute = ({navigation, uid}) => {
         return (
           <View style={styles.postContainer}>
             <View style={styles.postHeader}>
-              <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
+              <Text style={styles.postTitle}>{item.Title}</Text>
               <View style={styles.postUser}>
                 <TouchableOpacity onPress={() => {if (item.uid === otherUserUid) {navigation.navigate('Profile');} else {
                   navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
@@ -196,7 +196,7 @@ const PublicPostsRoute = ({navigation, uid}) => {
                 </View>
               );
             })}
-            <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
+            <Text style={styles.postUserOpinion}>{item.Content}</Text>
             <Text style={styles.postTimestamp}>{createdAt}</Text>
             <View style={styles.postFooter}>
               <View style={styles.praiseContainer}>
@@ -246,7 +246,7 @@ const PrivatePostsRoute = ({navigation, uid}) => {
         return (
           <View style={styles.postContainer}>
             <View style={styles.postHeader}>
-              <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
+              <Text style={styles.postTitle}>{item.Title}</Text>
               <View style={styles.postUser}>
                 <TouchableOpacity onPress={() => {if (item.uid === otherUserUid) {navigation.navigate('Profile');} else {
                   navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
@@ -273,7 +273,7 @@ const PrivatePostsRoute = ({navigation, uid}) => {
                 </View>
               );
             })}
-            <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
+            <Text style={styles.postUserOpinion}>{item.Content}</Text>
             <Text style={styles.postTimestamp}>{createdAt}</Text>
             <View style={styles.postFooter}>
               <View style={styles.praiseContainer}>
@@ -327,7 +327,7 @@ const QuestionPostsRoute = ({navigation, uid}) => {
         return (
           <View style={styles.postContainer}>
             <View style={styles.postHeader}>
-              <Text style={styles.postTitle}>{item.title}</Text>
+              <Text style={styles.postTitle}>{item.Title}</Text>
               <View style={styles.postUser}>
                 <TouchableOpacity onPress={() => {if (item.uid === otherUserUid) {navigation.navigate('Profile');} else {
                   navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
@@ -342,7 +342,7 @@ const QuestionPostsRoute = ({navigation, uid}) => {
                 </TouchableOpacity>
               </View>
             </View>
-            <Text style={styles.postUserQuestion}>{item.question}</Text>
+            <Text style={styles.postUserQuestion}>{item.Content}</Text>
             <Text style={styles.postTimestamp}>{createdAt}</Text>
             <View style={styles.postFooter}>
               <View style={styles.praiseContainer}>

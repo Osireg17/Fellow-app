@@ -173,7 +173,7 @@ export default function Questions({navigation}) {
       return (
         <View style={styles.postContainer}>
           <View style={styles.postHeader}>
-            <Text style={styles.postTitle}>{item.title}</Text>
+            <Text style={styles.postTitle}>{item.Title}</Text>
               <View style={styles.postUser}>
                 <TouchableOpacity
                   onPress={() => navigateToOtherProfile(item, uid)}
@@ -191,7 +191,7 @@ export default function Questions({navigation}) {
                 </TouchableOpacity>
               </View>
             </View>
-          <Text style={styles.postUserOpinion}>{item.question}</Text>
+          <Text style={styles.postUserOpinion}>{item.Content}</Text>
           <View style={styles.postFooter}>
             <Text style={styles.postTimestamp}>{createdAt}</Text>
             <PostStats post={item} uid={uid} />

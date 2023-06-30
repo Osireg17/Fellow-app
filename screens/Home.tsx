@@ -282,7 +282,7 @@ const FirstRoute = ({publicPosts}) => (
           return (
             <View style={styles.postContainer}>
               <View style={styles.postHeader}>
-                <Text style={styles.postTitle}>{item.userOpinionTitle}</Text>
+                <Text style={styles.postTitle}>{item.Title}</Text>
                 <View style={styles.postUser}>
                   <TouchableOpacity onPress={() => {if (item.uid === uid) {navigation.navigate('Profile');} else {
                     navigation.navigate('OtherUserProfilePage', {uid: item.uid });}}}>
@@ -309,7 +309,7 @@ const FirstRoute = ({publicPosts}) => (
                   </View>
                 );
               })}
-              <Text style={styles.postUserOpinion}>{item.userOpinion}</Text>
+              <Text style={styles.postUserOpinion}>{item.Content}</Text>
               <Text style={styles.postTimestamp}>{createdAt}</Text>
               <PostStats
                 uid={uid}

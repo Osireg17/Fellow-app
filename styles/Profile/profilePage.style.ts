@@ -5,21 +5,21 @@ const styles = StyleSheet.create({
     profileContainer: {
       flex: 1,
       alignItems: 'flex-start',
-      padding: 20,
+      padding: 10,
       backgroundColor: '#ffffff',
       marginTop: -60,
     },
     username: {
       fontSize: 36,
       fontWeight: 'bold',
-      marginBottom: 20,
+      marginBottom: 10,
     },
     headerContainer: {
       flexDirection: 'row',
-      marginBottom: 10,
+      marginBottom: 5,
     },
     avatar: {
-      marginRight: 20,
+      marginRight: 15,
     },
     statsContainer: {
       flexDirection: 'row',
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
       fontSize: 16,
     },
     detailsContainer: {
-      marginTop: 22,
+      marginTop: 12,
       flexDirection: 'row',
       justifyContent: 'space-between',
       width: '100%',
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
-    padding: 15,
+    padding: 10,
   },
   postHeader: {
     flexDirection: 'row',

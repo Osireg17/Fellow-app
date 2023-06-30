@@ -52,10 +52,14 @@ const Activity = () => {
     const q2 = query(privateCollection, where('uid', '==', uid));
     const querySnapshot2 = await getDocs(q2);
 
+    const questionCollection = collection(database, 'questions');
+    const q3 = query(privateCollection, where('uid', '==', uid));
+    const querySnapshot3 = await getDocs(q3);
+
 
     let activities = [];
 
-    for (const postDoc of querySnapshot.docs || querySnapshot2.docs) {
+    for (const postDoc of querySnapshot.docs || querySnapshot2.docs || querySnapshot3.docs) {
       let postData = postDoc.data();
 
       // Step 2: Get the likes array from each post
@@ -72,7 +76,7 @@ const Activity = () => {
             activities.push({
               type: 'post',
               username: likerData.username,
-              userOpinionTitle: postData.userOpinionTitle,
+              Title: likerData.Title,
               profilePic: likerData.profilePicture,
             });
           }
@@ -104,7 +108,7 @@ const Activity = () => {
                     <View>
                         <Text style={styles.username}>{item.username}</Text>
                         <Text style={styles.action}>liked your post</Text>
-                        <Text style={styles.postTitle}>"{item.userOpinionTitle}"</Text>
+                        <Text style={styles.postTitle}>"{item.Title}"</Text>
                     </View>
                 </View>
             ))}

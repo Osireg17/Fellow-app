@@ -112,7 +112,7 @@ function Feeds() {
         tabBarStyle: {
           backgroundColor: '#ffffff',
           position: 'absolute',
-          height: 90,
+          height: 75,
           paddingTop: 20,
           
         },
